@@ -1,0 +1,15 @@
+load("@rules_proto_grpc//:defs.bzl", "proto_plugin")
+
+proto_plugin(
+    name = "google_js_plugin",
+    exclusions = [
+        "google/protobuf",
+    ],
+    options = [
+        "import_style=commonjs",
+        "binary",
+    ],
+    outputs = ["{protopath}_pb.js"],
+    tool = "@com_google_protobuf_javascript//generator:protoc-gen-js",
+    visibility = ["//visibility:public"],
+)
