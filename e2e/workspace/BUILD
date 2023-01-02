@@ -18,16 +18,18 @@ build_test(
 
 # gazelle:prefix github.com/gonzojive/rules_ts_proto/e2e/workspace
 # gazelle:go_generate_proto false
+# gazelle:proto_import_prefix github.com/gonzojive/rules_ts_proto/example/prefix
 gazelle(name = "gazelle")
 
 proto_library(
-    name = "com_example_greeting_v1_proto",
+    name = "greeting_proto",
     srcs = ["greeting.proto"],
+    import_prefix = "github.com/gonzojive/rules_ts_proto/example/prefix",
     visibility = ["//visibility:public"],
 )
 
 ts_proto_library(
-    name = "flub",
-    proto = ":com_example_greeting_v1_proto",
+    name = "greeting_ts_proto",
+    proto = ":greeting_proto",
     visibility = ["//visibility:public"],
 )

@@ -14,7 +14,7 @@ proto_plugin(
         "google/protobuf",
     ],
     options = [
-        "import_style=commonjs",
+        "import_style=es6",
         "binary",
     ],
     outputs = ["{protopath}_pb.js"],

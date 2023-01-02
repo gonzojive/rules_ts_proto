@@ -52,43 +52,6 @@ _google_js_plugin_compile = rule(
     ],
 )
 
-# def _ts_proto_defs_compile_impl(ctx):
-#     """
-#     Implementation function for ts_proto_defs_compile.
-
-#     Args:
-#         ctx: The Bazel rule execution context object.
-
-#     Returns:
-#         Providers:
-#             - ProtoCompileInfo
-#             - DefaultInfo
-
-#     """
-#     base_env = {
-#         # Make up for https://github.com/bazelbuild/bazel/issues/15470.
-#         "BAZEL_BINDIR": ctx.bin_dir.path,
-#     }
-#     return proto_compile_impl(ctx, base_env = base_env)
-
-# # based on https://github.com/aspect-build/rules_js/issues/397
-# ts_proto_defs_compile = rule(
-#     implementation = _ts_proto_compile_impl,
-#     attrs = dict(
-#         proto_compile_attrs,
-#         _plugins = attr.label_list(
-#             providers = [ProtoPluginInfo],
-#             default = [
-#                 Label("//ts_proto/codegen:ts_protoc_gen_plugin"),
-#             ],
-#             doc = "List of protoc plugins to apply",
-#         ),
-#     ),
-#     toolchains = [
-#         str(Label("@rules_proto_grpc//protobuf:toolchain_type")),
-#     ],
-# )
-
 def ts_proto_library(name, proto, visibility = None, deps = []):
     """A rule for compiling protobufs into a ts_project.
 
