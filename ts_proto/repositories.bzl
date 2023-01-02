@@ -25,6 +25,8 @@ def local_repository(name, **kwargs):
 # and released only in semver majors.
 # This is all fixed by bzlmod, so we just tolerate it for now.
 def rules_ts_proto_dependencies():
+    """Repositories required by rules_ts_proto."""
+
     # The minimal version of bazel_skylib we require
     http_archive(
         name = "bazel_skylib",
@@ -53,4 +55,11 @@ def rules_ts_proto_dependencies():
         urls = [
             "https://github.com/bazelbuild/rules_proto/archive/refs/tags/5.3.0-21.7.tar.gz",
         ],
+    )
+
+    http_archive(
+        name = "aspect_rules_js",
+        sha256 = "66ecc9f56300dd63fb86f11cfa1e8affcaa42d5300e2746dba08541916e913fd",
+        strip_prefix = "rules_js-1.13.0",
+        url = "https://github.com/aspect-build/rules_js/archive/refs/tags/v1.13.0.tar.gz",
     )
