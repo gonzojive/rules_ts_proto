@@ -1,5 +1,13 @@
 load("@rules_proto_grpc//:defs.bzl", "proto_plugin")
+load("@rules_ts_proto_npm//:ts-protoc-gen/package_json.bzl", _ts_proto_gen_bin_factories = "bin")
 
+_ts_proto_gen_bin_factories.protoc_gen_ts_binary(
+    name = "protoc-gen-ts",
+    visibility = ["//visibility:public"],
+)
+
+# Official Google plugin for generating JavaScript... with some heavy
+# modifications to support ES6 modules.
 proto_plugin(
     name = "google_js_plugin",
     exclusions = [
@@ -11,5 +19,18 @@ proto_plugin(
     ],
     outputs = ["{protopath}_pb.js"],
     tool = "@com_google_protobuf_javascript//generator:protoc-gen-js",
+    visibility = ["//visibility:public"],
+)
+
+# Plugin that generates type definitions for the google_js_plugin.
+proto_plugin(
+    name = "ts_protoc_gen_plugin",
+    options = [
+        # "import_style=commonjs",
+        # "binary",
+    ],
+    outputs = ["{protopath}_pb.d.ts"],
+    tool = ":protoc-gen-ts",
+    use_built_in_shell_environment = False,
     visibility = ["//visibility:public"],
 )

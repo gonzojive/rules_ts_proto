@@ -11,8 +11,8 @@ load(
 #load("//bazel:mgh_ts_library.bzl", "ts_library")
 # load("@aspect_rules_js//js:defs.bzl", "js_library")
 
-def _ts_proto_compile_impl(ctx):
-    """Implementation function for ts_proto_compile.
+def _google_js_plugin_compile_impl(ctx):
+    """Implementation function for google_js_plugin_compile.
 
     Args:
         ctx: The Bazel rule execution context object.
@@ -29,8 +29,8 @@ def _ts_proto_compile_impl(ctx):
     return proto_compile_impl(ctx, base_env = base_env)
 
 # based on https://github.com/aspect-build/rules_js/issues/397
-_ts_proto_compile = rule(
-    implementation = _ts_proto_compile_impl,
+_google_js_plugin_compile = rule(
+    implementation = _google_js_plugin_compile_impl,
     attrs = dict(
         proto_compile_attrs,
         _plugins = attr.label_list(
@@ -40,6 +40,9 @@ _ts_proto_compile = rule(
                 # https://github.com/protocolbuffers/protobuf-javascript
                 # npm package: https://www.npmjs.com/package/google-protobuf
                 Label("//ts_proto/codegen:google_js_plugin"),
+
+                # Generate type definitions for the generated .js code.
+                Label("//ts_proto/codegen:ts_protoc_gen_plugin"),
             ],
             doc = "List of protoc plugins to apply",
         ),
@@ -48,6 +51,43 @@ _ts_proto_compile = rule(
         str(Label("@rules_proto_grpc//protobuf:toolchain_type")),
     ],
 )
+
+# def _ts_proto_defs_compile_impl(ctx):
+#     """
+#     Implementation function for ts_proto_defs_compile.
+
+#     Args:
+#         ctx: The Bazel rule execution context object.
+
+#     Returns:
+#         Providers:
+#             - ProtoCompileInfo
+#             - DefaultInfo
+
+#     """
+#     base_env = {
+#         # Make up for https://github.com/bazelbuild/bazel/issues/15470.
+#         "BAZEL_BINDIR": ctx.bin_dir.path,
+#     }
+#     return proto_compile_impl(ctx, base_env = base_env)
+
+# # based on https://github.com/aspect-build/rules_js/issues/397
+# ts_proto_defs_compile = rule(
+#     implementation = _ts_proto_compile_impl,
+#     attrs = dict(
+#         proto_compile_attrs,
+#         _plugins = attr.label_list(
+#             providers = [ProtoPluginInfo],
+#             default = [
+#                 Label("//ts_proto/codegen:ts_protoc_gen_plugin"),
+#             ],
+#             doc = "List of protoc plugins to apply",
+#         ),
+#     ),
+#     toolchains = [
+#         str(Label("@rules_proto_grpc//protobuf:toolchain_type")),
+#     ],
+# )
 
 def ts_proto_library(name, proto, visibility = None, deps = []):
     """A rule for compiling protobufs into a ts_project.
@@ -59,7 +99,7 @@ def ts_proto_library(name, proto, visibility = None, deps = []):
         deps: TypeScript dependencies.
     """
 
-    _ts_proto_compile(
+    _google_js_plugin_compile(
         name = name + "_compile",
         protos = [
             proto,

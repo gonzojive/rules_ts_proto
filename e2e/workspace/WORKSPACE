@@ -76,3 +76,11 @@ go_rules_dependencies()
 go_register_toolchains(version = "1.18.3")
 
 gazelle_dependencies()
+
+load("@com_github_gonzojive_rules_ts_proto//ts_proto:workspace_deps.bzl", "install_rules_ts_proto")
+
+install_rules_ts_proto()
+
+load("@rules_ts_proto_npm//:repositories.bzl", "npm_repositories")
+
+npm_repositories()
