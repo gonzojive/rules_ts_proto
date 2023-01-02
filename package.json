@@ -1,0 +1,15 @@
+{
+  "name": "rules_ts_proto",
+  "private": true,
+  "type": "module",
+  "description": "Rules for generating TypeScript/JavaScript code for protobufs.",
+  "license": "Apache 2",
+  "engines": {
+    "node": ">=14.17.1",
+    "yarn": ">=1.9.2"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "ts-protoc-gen": "^0.15.0"
+  }
+}

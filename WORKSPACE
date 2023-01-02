@@ -54,6 +54,12 @@ nodejs_register_toolchains(
     node_version = DEFAULT_NODE_VERSION,
 )
 
+# Based on
+# https://github.com/aspect-build/rules_js/blob/main/docs/faq.md#can-i-use-bazel-managed-pnpm
+load("@aspect_rules_js//npm:npm_import.bzl", "pnpm_repository")
+
+pnpm_repository(name = "pnpm")
+
 # load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
 
 # npm_translate_lock(
