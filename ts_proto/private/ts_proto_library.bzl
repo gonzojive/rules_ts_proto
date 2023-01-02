@@ -71,6 +71,24 @@ def ts_proto_library(name, proto, visibility = None, deps = []):
         verbose = 4,
     )
 
+    implicit_deps = [
+        "@com_github_gonzojive_rules_ts_proto//:node_modules/@types/google-protobuf",
+        "@com_github_gonzojive_rules_ts_proto//:node_modules/google-protobuf",
+    ]
+    deps = [x for x in deps]
+    for want_dep in implicit_deps:
+        if want_dep not in deps:
+            deps.append(want_dep)
+
+    js_library(
+        name = name,
+        srcs = [
+            name + "_uber",
+        ],
+        deps = deps,
+        visibility = visibility,
+    )
+
     # implicit_deps = [
     #     "//:node_modules/@types/google-protobuf",
     #     "//:node_modules/google-protobuf",
