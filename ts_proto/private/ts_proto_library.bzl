@@ -9,7 +9,7 @@ load(
 #load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 
 #load("//bazel:mgh_ts_library.bzl", "ts_library")
-# load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
 
 def _google_js_plugin_compile_impl(ctx):
     """Implementation function for google_js_plugin_compile.
@@ -83,29 +83,11 @@ def ts_proto_library(name, proto, visibility = None, deps = []):
     js_library(
         name = name,
         srcs = [
-            name + "_uber",
+            name + "_compile",
         ],
         deps = deps,
         visibility = visibility,
     )
-
-    # implicit_deps = [
-    #     "//:node_modules/@types/google-protobuf",
-    #     "//:node_modules/google-protobuf",
-    # ]
-    # deps = [x for x in deps]
-    # for want_dep in implicit_deps:
-    #     if want_dep not in deps:
-    #         deps.append(want_dep)
-
-    # js_library(
-    #     name = name + "_lib",
-    #     srcs = [
-    #         name + "_uber",
-    #     ],
-    #     deps = deps,
-    #     visibility = visibility,
-    # )
 
     # # TypeScript import resolution description:
     # # https://www.typescriptlang.org/docs/handbook/module-resolution.html
@@ -119,18 +101,4 @@ def ts_proto_library(name, proto, visibility = None, deps = []):
     #         ".",
     #     ],
     #     visibility = visibility,
-    # )
-
-    # _protobuf_ts_compile(
-    #     name = name + "_protobuf_ts",
-    #     protos = [proto],
-    #     visibility = visibility,
-    #     verbose = 4,
-    # )
-
-    # _ts_unofficial_compile(
-    #     name = name + "_ts_unofficial",
-    #     protos = [proto],
-    #     visibility = visibility,
-    #     verbose = 4,
     # )
