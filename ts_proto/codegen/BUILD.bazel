@@ -34,3 +34,20 @@ proto_plugin(
     use_built_in_shell_environment = False,
     visibility = ["//visibility:public"],
 )
+
+# grpc-web
+proto_plugin(
+    name = "com_github_grpc_grpc_web",
+    # Used if the output of the generator is empty.
+    # empty_template = "com_github_grpc_grpc_web_empty.js",
+    options = [
+        "import_style=commonjs+dts",
+        "mode=grpcweb",
+    ],
+    outputs = [
+        "{protopath}_grpc_web_pb.js",
+        "{protopath}_grpc_web_pb.d.ts",
+    ],
+    tool = "@com_github_grpc_grpc_web//javascript/net/grpc/web/generator:protoc-gen-grpc-web",
+    visibility = ["//visibility:public"],
+)

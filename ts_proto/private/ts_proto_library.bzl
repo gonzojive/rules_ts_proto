@@ -43,6 +43,9 @@ _google_js_plugin_compile = rule(
 
                 # Generate type definitions for the generated .js code.
                 Label("//ts_proto/codegen:ts_protoc_gen_plugin"),
+
+                # Generates gRPC-web code.
+                Label("//ts_proto/codegen:com_github_grpc_grpc_web"),
             ],
             doc = "List of protoc plugins to apply",
         ),

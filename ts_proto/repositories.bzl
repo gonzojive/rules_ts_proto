@@ -63,3 +63,14 @@ def rules_ts_proto_dependencies():
         strip_prefix = "rules_js-1.13.0",
         url = "https://github.com/aspect-build/rules_js/archive/refs/tags/v1.13.0.tar.gz",
     )
+
+    local_repository(
+        name = "com_github_grpc_grpc_web",
+        path = "/home/red/code/grpc-web",
+    )
+
+    # git_repository(
+    #     name = "com_github_grpc_grpc_web",
+    #     commit = "e49389873d887d15ab2870288f620aa2f15b3b85",
+    #     remote = "https://github.com/grpc/grpc-web.git",
+    # )
