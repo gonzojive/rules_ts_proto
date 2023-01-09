@@ -9,6 +9,8 @@ gazelle_binary(
     languages = ["@bazel_skylib//gazelle/bzl"],
 )
 
+# gazelle:prefix github.com/gonzojive/rules_ts_proto
+# gazelle:build_file_name BUILD,BUILD.bazel
 gazelle(
     name = "gazelle",
     gazelle = "gazelle_bin",

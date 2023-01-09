@@ -6,9 +6,6 @@ load(
     "proto_compile_attrs",
     "proto_compile_impl",
 )
-#load("@aspect_rules_js//npm:defs.bzl", "npm_package")
-
-#load("//bazel:mgh_ts_library.bzl", "ts_library")
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@aspect_rules_js//js:libs.bzl", "js_library_lib")
 load("@bazel_skylib//lib:paths.bzl", "paths")
@@ -49,7 +46,7 @@ def _google_js_plugin_compile_impl(ctx):
 
     generated_code_dir = paths.join(ctx.bin_dir.path, ctx.label.package)
 
-    map_entries = [_import_map_entry(dep) for dep in ctx.attr.deps]
+    map_entries = [_import_map_entry(generated_code_dir, dep) for dep in ctx.attr.deps]
     map_entries = [x for x in map_entries if x != None]
 
     if len(map_entries) == 1:
@@ -64,7 +61,7 @@ def _google_js_plugin_compile_impl(ctx):
 
     return proto_compile_impl(ctx, base_env = base_env)
 
-def _import_map_entry(dep):
+def _import_map_entry(generated_code_dir, dep):
     #if not (TsProtoInfo in dep):
     #    return None
     ts_proto_info = dep[TsProtoInfo]
@@ -195,35 +192,9 @@ _ts_proto_library_rule = rule(
         ),
         "js_library": attr.label(
             mandatory = True,
-            providers = [DefaultInfo, JsInfo],
+            providers = js_library_lib.provides,
             doc = "Label that provides JsInfo for the generated JavaScript for this rule.",
         ),
-        # "js_library": attr.label_list(
-        #     mandatory = True,
-        #     providers = [JsInfo],
-        #     doc = "Label that provides JsInfo for the generated JavaScript for this rule.",
-        # ),
-        # "options": attr.string_list_dict(
-        #     doc = "Extra options to pass to plugins, as a dict of plugin label -> list of strings. The key * can be used exclusively to apply to all plugins",
-        # ),
-        # "verbose": attr.int(
-        #     doc = "The verbosity level. Supported values and results are 0: Show nothing, 1: Show command, 2: Show command and sandbox after running protoc, 3: Show command and sandbox before and after running protoc, 4. Show env, command, expected outputs and sandbox before and after running protoc",
-        # ),
-        # "prefix_path": attr.string(
-        #     doc = "Path to prefix to the generated files in the output directory",
-        # ),
-        # "extra_protoc_args": attr.string_list(
-        #     doc = "A list of extra args to pass directly to protoc, not as plugin options",
-        # ),
-        # "extra_protoc_files": attr.label_list(
-        #     allow_files = True,
-        #     doc = "List of labels that provide extra files to be available during protoc execution",
-        # ),
-        # "output_mode": attr.string(
-        #     default = "PREFIXED",
-        #     values = ["PREFIXED", "NO_PREFIX", "NO_PREFIX_FLAT"],
-        #     doc = "The output mode for the target. PREFIXED (the default) will output to a directory named by the target within the current package root, NO_PREFIX will output files directly to the current package, NO_PREFIX_FLAT will ouput directly to the current package without mirroring the package tree. Using NO_PREFIX may lead to conflicting writes",
-        # ),
     },
     toolchains = [],
     provides = [TsProtoInfo] + js_library_lib.provides,

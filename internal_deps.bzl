@@ -13,15 +13,12 @@ def http_archive(name, **kwargs):
 def rules_ts_proto_internal_deps():
     "Fetch deps needed for local development"
     http_archive(
-        name = "io_bazel_rules_go",
-        sha256 = "099a9fb96a376ccbbb7d291ed4ecbdfd42f6bc822ab77ae6f1b5cb9e914e94fa",
-        urls = ["https://github.com/bazelbuild/rules_go/releases/download/v0.35.0/rules_go-v0.35.0.zip"],
-    )
-
-    http_archive(
         name = "bazel_gazelle",
         sha256 = "448e37e0dbf61d6fa8f00aaa12d191745e14f07c31cabfa731f0c8e8a4f41b97",
-        urls = ["https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.28.0/bazel-gazelle-v0.28.0.tar.gz"],
+        urls = [
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.28.0/bazel-gazelle-v0.28.0.tar.gz",
+            "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.28.0/bazel-gazelle-v0.28.0.tar.gz",
+        ],
     )
 
     # Override bazel_skylib distribution to fetch sources instead

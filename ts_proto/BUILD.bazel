@@ -27,10 +27,12 @@ bzl_library(
     name = "defs",
     srcs = ["defs.bzl"],
     visibility = ["//visibility:public"],
+    deps = ["//ts_proto/private:ts_proto_library"],
 )
 
 bzl_library(
-    name = "toolchain",
-    srcs = ["toolchain.bzl"],
+    name = "workspace_deps",
+    srcs = ["workspace_deps.bzl"],
     visibility = ["//visibility:public"],
+    deps = ["@aspect_rules_js//npm:npm_import"],
 )
