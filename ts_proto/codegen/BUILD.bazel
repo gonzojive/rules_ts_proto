@@ -43,6 +43,8 @@ proto_plugin(
     options = [
         "import_style=commonjs+dts",
         "mode=grpcweb",
+        "explicit_imports=true",
+        "explicit_import__github.com/gonzojive/rules_ts_proto/example/prefix/greeting.proto=../foo.js",
     ],
     outputs = [
         "{protopath}_grpc_web_pb.js",

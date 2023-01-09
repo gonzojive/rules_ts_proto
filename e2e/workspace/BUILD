@@ -26,10 +26,16 @@ proto_library(
     srcs = ["greeting.proto"],
     import_prefix = "github.com/gonzojive/rules_ts_proto/example/prefix",
     visibility = ["//visibility:public"],
+    deps = [
+        "//location:location_proto",
+    ],
 )
 
 ts_proto_library(
     name = "greeting_ts_proto",
     proto = ":greeting_proto",
     visibility = ["//visibility:public"],
+    deps = [
+        "//location:location_ts_proto",
+    ],
 )

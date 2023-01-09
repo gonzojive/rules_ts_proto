@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package someorg.lines;
+
+import "github.com/gonzojive/rules_ts_proto/example/prefix/location/location.proto";
+
+message Polyline {
+    repeated .someorg.type.Position points = 1;
+}
