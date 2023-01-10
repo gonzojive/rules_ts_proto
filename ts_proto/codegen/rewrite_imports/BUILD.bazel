@@ -23,6 +23,14 @@ go_binary(
     args = [
         "--alsologtostderr",
     ],
-    embed = [":go_default_library"],
+    embed = [":rewrite_imports_lib"],
     visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "rewrite_imports_lib",
+    srcs = ["rewrite_imports.go"],
+    importpath = "github.com/gonzojive/rules_ts_proto/ts_proto/codegen/rewrite_imports",
+    visibility = ["//visibility:private"],
+    deps = ["@com_github_golang_glog//:go_default_library"],
 )

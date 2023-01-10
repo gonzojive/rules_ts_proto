@@ -6,7 +6,11 @@ npm_link_all_packages(name = "node_modules")
 
 gazelle_binary(
     name = "gazelle_bin",
-    languages = ["@bazel_skylib//gazelle/bzl"],
+    languages = [
+        "@bazel_skylib//gazelle/bzl",
+        "@bazel_gazelle//language/go",  # Built-in rule from gazelle for Golang.
+        "@bazel_gazelle//language/proto",  # Built-in rule from gazelle for Protos.
+    ],
 )
 
 # gazelle:prefix github.com/gonzojive/rules_ts_proto
