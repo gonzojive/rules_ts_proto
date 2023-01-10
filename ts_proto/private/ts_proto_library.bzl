@@ -15,6 +15,7 @@ TsProtoInfo = provider(
     "Describes a generated proto library for TypeScript.",
     fields = {
         "proto_info": "ProtoInfo for the library.",
+        "ts_proto_library_label": "Label of the ts_proto_library that produced the generated code.",
         #"js_info": "JsInfo for the library",
         "primary_js_file": "JavaScript file that should be imported when depending on this library to import messages, enums, etc.",
         "grpc_web_js_file": "JavaScript file that should be imported when depending on this library to import messages, enums, etc.",
@@ -44,6 +45,7 @@ def _google_js_plugin_compile_impl(ctx):
 
     map_entries = [_import_map_entry(generated_code_dir, dep) for dep in ctx.attr.deps]
     map_entries = [x for x in map_entries if x != None]
+    map_entries.append(_this_rule_import_map_entry(ctx))
 
     config_json = json.encode(struct(
         action_description = "Generating JS/TS code as part of {}".format(ctx.label),
@@ -60,9 +62,27 @@ def _google_js_plugin_compile_impl(ctx):
     # Execute with extracted attrs
     return proto_compile_impl(ctx, options_override = options)
 
+def _this_rule_import_map_entry(ctx):
+    """Returns an object that specifies how to import the current rule's messages.
+
+    The returned struct must match the JSON spec in protoc_plugin.go.
+    """
+    proto_info = ctx.attr.protos[0][ProtoInfo]
+    proto_filename = _import_paths_of_direct_sources(proto_info)[0]
+    js_import = "./" + paths.basename(proto_filename).removesuffix(".proto") + "_pb"
+    return struct(
+        proto_import = proto_filename,
+        js_import = js_import,
+        ts_proto_library_label = _label_for_printing(ctx.label),
+    )
+
 def _import_map_entry(generated_code_dir, dep):
-    #if not (TsProtoInfo in dep):
-    #    return None
+    """Returns an object that specifies how to import a dep.
+
+    The returned struct must match the JSON spec in protoc_plugin.go.
+    """
+    if not (TsProtoInfo in dep):
+        return None
     ts_proto_info = dep[TsProtoInfo]
     proto_info = ts_proto_info.proto_info
     relative_import = _relative_path(
@@ -72,6 +92,9 @@ def _import_map_entry(generated_code_dir, dep):
     return struct(
         proto_import = _import_paths_of_direct_sources(proto_info)[0],
         js_import = relative_import,
+        ts_proto_library_label = _label_for_printing(
+            ts_proto_info.ts_proto_library_label,
+        ),
     )
 
 # based on https://github.com/aspect-build/rules_js/issues/397
@@ -175,6 +198,7 @@ def _ts_proto_library_rule_impl(ctx):
         # Also provide TsProtoInfo.
         TsProtoInfo(
             proto_info = ctx.attr.proto[ProtoInfo],
+            ts_proto_library_label = ctx.label,
             #js_info = ctx.attr.js_library[JsInfo],
             primary_js_file = main_library_file,
             grpc_web_js_file = grpc_web_library_file,
@@ -300,3 +324,6 @@ def _relative_path(target, start):
     result += t_pieces[common_part_len:]
 
     return "/".join(result) if len(result) > 0 else "."
+
+def _label_for_printing(label):
+    return "{}".format(label)

@@ -175,12 +175,12 @@ func processGRPCResponse(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.Code
 	// ts-gen-protoc plugin. We still output the file simply for debugging
 	// purposes.
 	filenames := map[string]bool{}
-	// for _, f := range resp.GetFile() {
-	// 	filenames[f.GetName()] = true
-	// 	if strings.HasSuffix(f.GetName(), "_pb.d.ts") && !strings.HasSuffix(f.GetName(), "grpc_web_pb.d.ts") {
-	// 		*f.Name = strings.TrimSuffix(f.GetName(), "_pb.d.ts") + "_pb_DEBUG.d.ts"
-	// 	}
-	// }
+	for _, f := range resp.GetFile() {
+		filenames[f.GetName()] = true
+		// if strings.HasSuffix(f.GetName(), "_pb.d.ts") && !strings.HasSuffix(f.GetName(), "grpc_web_pb.d.ts") {
+		// 	*f.Name = strings.TrimSuffix(f.GetName(), "_pb.d.ts") + "_pb_DEBUG.d.ts"
+		// }
+	}
 	for _, fileToGenerate := range req.GetFileToGenerate() {
 		serviceJS := fmt.Sprintf("%s_grpc_web_pb.js", strings.TrimSuffix(fileToGenerate, ".proto"))
 		typings := fmt.Sprintf("%s_grpc_web_pb.d.ts", strings.TrimSuffix(fileToGenerate, ".proto"))
@@ -238,13 +238,13 @@ type config struct {
 	MappingEntries    []mappingEntry `json:"mapping_entries"`
 }
 
-func (c *config) find(protoImport string) string {
+func (c *config) find(protoImport string) *mappingEntry {
 	for _, me := range c.MappingEntries {
 		if me.ProtoImport == protoImport {
-			return me.JSImport
+			return &me
 		}
 	}
-	return ""
+	return nil
 }
 
 func configFromRequest(req *pluginpb.CodeGeneratorRequest) (*config, error) {
@@ -273,8 +273,9 @@ func configFromRequest(req *pluginpb.CodeGeneratorRequest) (*config, error) {
 }
 
 type mappingEntry struct {
-	ProtoImport string `json:"proto_import"`
-	JSImport    string `json:"js_import"`
+	ProtoImport         string `json:"proto_import"`
+	JSImport            string `json:"js_import"`
+	TSProtoLibraryLabel string `json:"ts_proto_library_label"`
 }
 
 func unmarshalJSON[T any](data []byte) (*T, error) {
@@ -295,12 +296,12 @@ func replaceProtoImports(cfg *config, es6Code string) (string, error) {
 		// currentImport := groups[2]
 		protoImport := groups[3]
 		replacement := cfg.find(protoImport)
-		if replacement == "" {
+		if replacement == nil {
 			errors = append(errors, fmt.Errorf("failed to replace import for proto %q; not in import map %+v", protoImport, cfg))
 			return fmt.Sprintf("// ERROR: Failed to perform substitution of proto import %q: %s", protoImport, groups[0])
 		}
-		return fmt.Sprintf(`import %s from "%s"; // proto import: "%s" - updated by protoc_plugin.go`,
-			aliasesAndWhatnot, replacement, protoImport)
+		return fmt.Sprintf(`import %s from "%s"; // proto import: %q; ts_proto_library: %s - updated by protoc_plugin.go`,
+			aliasesAndWhatnot, replacement.JSImport, protoImport, replacement.TSProtoLibraryLabel)
 	})
 	if len(errors) != 0 {
 		return updatedCode, errors[0]

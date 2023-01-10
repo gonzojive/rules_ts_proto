@@ -12,7 +12,7 @@ build_test(
     name = "smoke_test",
     targets = [
         # targets you add above
-        ":empty",
+        ":greeting_ts_proto",
     ],
 )
 
