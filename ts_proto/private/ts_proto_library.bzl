@@ -98,16 +98,17 @@ _google_js_plugin_compile = rule(
         _plugins = attr.label_list(
             providers = [ProtoPluginInfo],
             default = [
+                Label("//ts_proto/codegen:delegating_plugin"),
                 # TODO(reddaly): Modify to use
                 # https://github.com/protocolbuffers/protobuf-javascript
                 # npm package: https://www.npmjs.com/package/google-protobuf
-                Label("//ts_proto/codegen:google_js_plugin"),
+                #Label("//ts_proto/codegen:google_js_plugin"),
 
                 # Generate type definitions for the generated .js code.
-                Label("//ts_proto/codegen:ts_protoc_gen_plugin"),
+                #Label("//ts_proto/codegen:ts_protoc_gen_plugin"),
 
                 # Generates gRPC-web code.
-                Label("//ts_proto/codegen:com_github_grpc_grpc_web"),
+                #Label("//ts_proto/codegen:com_github_grpc_grpc_web"),
             ],
             doc = "List of protoc plugins to apply",
         ),

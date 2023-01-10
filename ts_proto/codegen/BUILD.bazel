@@ -53,3 +53,20 @@ proto_plugin(
     tool = "@com_github_grpc_grpc_web//javascript/net/grpc/web/generator:protoc-gen-grpc-web",
     visibility = ["//visibility:public"],
 )
+
+proto_plugin(
+    name = "delegating_plugin",
+    options = [
+        "foo=bar",
+        "binary",
+    ],
+    outputs = [
+        "{protopath}_pb.js",
+        "{protopath}_pb.d.ts",
+        "{protopath}_grpc_web_pb.js",
+        "{protopath}_grpc_web_pb.d.ts",
+    ],
+    tool = "//ts_proto/codegen/protoc_plugin",
+    use_built_in_shell_environment = False,
+    visibility = ["//visibility:public"],
+)
