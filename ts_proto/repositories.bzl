@@ -73,6 +73,8 @@ def rules_ts_proto_dependencies():
         url = "https://github.com/aspect-build/rules_js/archive/refs/tags/v1.13.0.tar.gz",
     )
 
+    # Sometimes pushed to the reddaly-dev branch of
+    # https://github.com/gonzojive/grpc-web.git
     local_repository(
         name = "com_github_grpc_grpc_web",
         path = "/home/red/code/grpc-web",
