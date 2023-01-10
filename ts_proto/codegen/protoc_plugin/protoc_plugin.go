@@ -297,7 +297,7 @@ func replaceProtoImports(cfg *config, es6Code string) (string, error) {
 		replacement := cfg.find(protoImport)
 		if replacement == "" {
 			errors = append(errors, fmt.Errorf("failed to replace import for proto %q; not in import map %+v", protoImport, cfg))
-			return fmt.Sprint("// ERROR: Failed to perform substitution of proto import %q: %s", protoImport, groups[0])
+			return fmt.Sprintf("// ERROR: Failed to perform substitution of proto import %q: %s", protoImport, groups[0])
 		}
 		return fmt.Sprintf(`import %s from "%s"; // proto import: "%s" - updated by protoc_plugin.go`,
 			aliasesAndWhatnot, replacement, protoImport)
