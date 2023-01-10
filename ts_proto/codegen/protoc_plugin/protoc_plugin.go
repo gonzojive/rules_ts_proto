@@ -10,14 +10,14 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"github.com/bazelbuild/rules_go/go/runfiles"
 	"github.com/golang/glog"
-	"github.com/golang/protobuf/proto"
-
 	"google.golang.org/protobuf/encoding/prototext"
-	pbplugin "google.golang.org/protobuf/types/pluginpb"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/pluginpb"
 )
 
 const (
@@ -48,7 +48,7 @@ func run(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("error reading from stdin: %w", err)
 	}
-	req := &pbplugin.CodeGeneratorRequest{}
+	req := &pluginpb.CodeGeneratorRequest{}
 	if err := proto.Unmarshal(reqBytes, req); err != nil {
 		return fmt.Errorf("error reading CodeGeneratorRequest: %w", err)
 	}
@@ -100,14 +100,14 @@ func loadUberPlugin() (*uberPlugin, error) {
 	return out, nil
 }
 
-func (up *uberPlugin) generateCode(ctx context.Context, req *pbplugin.CodeGeneratorRequest) (*pbplugin.CodeGeneratorResponse, error) {
+func (up *uberPlugin) generateCode(ctx context.Context, req *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorResponse, error) {
 	cfg, err := configFromRequest(req)
 	if err != nil {
 		return nil, err
 	}
 	glog.Infof("got config: %+v", cfg)
 
-	runPluginWithParameter := func(toolPath, param string, postProcessors ...func(req *pbplugin.CodeGeneratorRequest, resp *pbplugin.CodeGeneratorResponse) error) (*pbplugin.CodeGeneratorResponse, error) {
+	runPluginWithParameter := func(toolPath, param string, postProcessors ...func(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.CodeGeneratorResponse) error) (*pluginpb.CodeGeneratorResponse, error) {
 		req := cloneProto(req)
 		req.Parameter = proto.String(param)
 		resp, err := runPlugin(ctx, toolPath, req)
@@ -121,17 +121,18 @@ func (up *uberPlugin) generateCode(ctx context.Context, req *pbplugin.CodeGenera
 		}
 		return resp, nil
 	}
-	defsResp, err := runPluginWithParameter(up.genTSDefsPluginPath, "")
+	importsReplacer := protoImportsReplacer(cfg)
+	defsResp, err := runPluginWithParameter(up.genTSDefsPluginPath, "", importsReplacer)
+	if err != nil {
+		return nil, fmt.Errorf("error running Google's protobuf-javascript codegen plugin: %w", err)
+	}
+
+	jsResp, err := runPluginWithParameter(up.genJSPluginPath, "import_style=es6,binary", importsReplacer)
 	if err != nil {
 		return nil, fmt.Errorf("error running ts definition codegen plugin: %w", err)
 	}
 
-	jsResp, err := runPluginWithParameter(up.genJSPluginPath, "import_style=es6,binary")
-	if err != nil {
-		return nil, fmt.Errorf("error running ts definition codegen plugin: %w", err)
-	}
-
-	grpcResp, err := runPluginWithParameter(up.genGRPCPluginPath, "import_style=commonjs+dts,mode=grpcweb", processGRPCResponse)
+	grpcResp, err := runPluginWithParameter(up.genGRPCPluginPath, "import_style=commonjs+dts,mode=grpcweb", processGRPCResponse, importsReplacer)
 	if err != nil {
 		return nil, fmt.Errorf("error running grpc definition codegen plugin: %w", err)
 	}
@@ -148,20 +149,20 @@ func (up *uberPlugin) generateCode(ctx context.Context, req *pbplugin.CodeGenera
 		errorField += fmt.Sprintf("Typescript definition code generation error: %s", jsResp.GetError())
 	}
 	if errorField != "" {
-		return &pbplugin.CodeGeneratorResponse{
+		return &pluginpb.CodeGeneratorResponse{
 			Error: proto.String(errorField),
 		}, nil
 	}
-	var files []*pbplugin.CodeGeneratorResponse_File
+	var files []*pluginpb.CodeGeneratorResponse_File
 	files = append(files, jsResp.GetFile()...)
 	files = append(files, defsResp.GetFile()...)
 	files = append(files, grpcResp.GetFile()...)
 
-	glog.Infof("output files: %s", mapSlice(files, func(f *pbplugin.CodeGeneratorResponse_File) string {
+	glog.Infof("output files: %s", mapSlice(files, func(f *pluginpb.CodeGeneratorResponse_File) string {
 		return f.GetName()
 	}))
 
-	return &pbplugin.CodeGeneratorResponse{
+	return &pluginpb.CodeGeneratorResponse{
 		SupportedFeatures: proto.Uint64(jsResp.GetSupportedFeatures()),
 		File:              files,
 	}, nil
@@ -175,7 +176,7 @@ func mapSlice[T, R any](s []T, f func(elem T) R) []R {
 	return out
 }
 
-func processGRPCResponse(req *pbplugin.CodeGeneratorRequest, resp *pbplugin.CodeGeneratorResponse) error {
+func processGRPCResponse(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.CodeGeneratorResponse) error {
 	// Rename the _pb.ts.d file because it conflicts with the output of the
 	// ts-gen-protoc plugin. We still output the file simply for debugging
 	// purposes.
@@ -192,13 +193,13 @@ func processGRPCResponse(req *pbplugin.CodeGeneratorRequest, resp *pbplugin.Code
 		emptyContents := fmt.Sprintf("// GENERATED DO NOT MODIFY\n// empty grpc-web file for %s\n", fileToGenerate)
 
 		if !filenames[serviceJS] {
-			resp.File = append(resp.File, &pbplugin.CodeGeneratorResponse_File{
+			resp.File = append(resp.File, &pluginpb.CodeGeneratorResponse_File{
 				Name:    proto.String(serviceJS),
 				Content: proto.String(emptyContents),
 			})
 		}
 		if !filenames[typings] {
-			resp.File = append(resp.File, &pbplugin.CodeGeneratorResponse_File{
+			resp.File = append(resp.File, &pluginpb.CodeGeneratorResponse_File{
 				Name:    proto.String(typings),
 				Content: proto.String(emptyContents),
 			})
@@ -208,7 +209,7 @@ func processGRPCResponse(req *pbplugin.CodeGeneratorRequest, resp *pbplugin.Code
 	return nil
 }
 
-func runPlugin(ctx context.Context, toolPath string, req *pbplugin.CodeGeneratorRequest) (*pbplugin.CodeGeneratorResponse, error) {
+func runPlugin(ctx context.Context, toolPath string, req *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorResponse, error) {
 	reqBytes, err := proto.Marshal(req)
 	if err != nil {
 		return nil, err
@@ -221,14 +222,14 @@ func runPlugin(ctx context.Context, toolPath string, req *pbplugin.CodeGenerator
 	if err != nil {
 		return nil, fmt.Errorf("error running tool %q: %w", toolPath, err)
 	}
-	resp := &pbplugin.CodeGeneratorResponse{}
+	resp := &pluginpb.CodeGeneratorResponse{}
 	if err := proto.Unmarshal(respBytes, resp); err != nil {
 		return nil, fmt.Errorf("tool %q ran successfully but gave non-protobuf response: %w", toolPath, err)
 	}
 	if resp.GetError() != "" {
 		return nil, fmt.Errorf("error running plugin %q: %q", toolPath, resp.GetError())
 	}
-	glog.Infof("output files from tool %s:\n  %s", toolPath, mapSlice(resp.GetFile(), func(f *pbplugin.CodeGeneratorResponse_File) string {
+	glog.Infof("output files from tool %s:\n  %s", toolPath, mapSlice(resp.GetFile(), func(f *pluginpb.CodeGeneratorResponse_File) string {
 		return f.GetName()
 	}))
 	return resp, nil
@@ -243,7 +244,16 @@ type config struct {
 	MappingEntries    []mappingEntry `json:"mapping_entries"`
 }
 
-func configFromRequest(req *pbplugin.CodeGeneratorRequest) (*config, error) {
+func (c *config) find(protoImport string) string {
+	for _, me := range c.MappingEntries {
+		if me.ProtoImport == protoImport {
+			return me.JSImport
+		}
+	}
+	return ""
+}
+
+func configFromRequest(req *pluginpb.CodeGeneratorRequest) (*config, error) {
 	for _, param := range strings.Split(req.GetParameter(), ",") {
 		parts := strings.SplitN(param, "=", 2)
 		if parts[0] == "config" {
@@ -279,4 +289,40 @@ func unmarshalJSON[T any](data []byte) (*T, error) {
 		return nil, fmt.Errorf("error while unmarshaling %T: %w", value, err)
 	}
 	return &value, nil
+}
+
+var replaceRegex = regexp.MustCompile(`import \{(.*)\} from "(.*)";\s+// proto import: "(.*)"`)
+
+func replaceProtoImports(cfg *config, es6Code string) (string, error) {
+	var errors []error
+	updatedCode := replaceRegex.ReplaceAllStringFunc(es6Code, func(importStatement string) string {
+		groups := replaceRegex.FindStringSubmatch(importStatement)
+		aliases := groups[1]
+		// currentImport := groups[2]
+		protoImport := groups[3]
+		replacement := cfg.find(protoImport)
+		if replacement == "" {
+			errors = append(errors, fmt.Errorf("failed to replace import for proto %q; not in import map %+v", protoImport, cfg))
+			return fmt.Sprint("// ERROR: Failed to perform substitution of proto import %q: %s", protoImport, groups[0])
+		}
+		return fmt.Sprintf(`import {%s} from "%s"; // proto import: "%s" - updated by protoc_plugin.go`,
+			aliases, replacement, protoImport)
+	})
+	if len(errors) != 0 {
+		return updatedCode, errors[0]
+	}
+	return updatedCode, nil
+}
+
+func protoImportsReplacer(cfg *config) func(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.CodeGeneratorResponse) error {
+	return func(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.CodeGeneratorResponse) error {
+		for _, f := range resp.GetFile() {
+			newCode, err := replaceProtoImports(cfg, f.GetContent())
+			if err != nil {
+				return err
+			}
+			f.Content = proto.String(newCode)
+		}
+		return nil
+	}
 }

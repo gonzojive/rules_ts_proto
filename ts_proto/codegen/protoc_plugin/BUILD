@@ -12,9 +12,9 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "@com_github_golang_glog//:go_default_library",
-        "@com_github_golang_protobuf//proto:go_default_library",
         "@io_bazel_rules_go//go/runfiles:go_default_library",
         "@org_golang_google_protobuf//encoding/prototext:go_default_library",
+        "@org_golang_google_protobuf//proto:go_default_library",
         "@org_golang_google_protobuf//types/pluginpb:go_default_library",
     ],
 )
