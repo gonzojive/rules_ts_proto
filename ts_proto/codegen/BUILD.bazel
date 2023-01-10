@@ -66,7 +66,6 @@ proto_plugin(
     outputs = [
         "{protopath}_pb.js",
         "{protopath}_pb.d.ts",
-        "{protopath}_pb_DEBUG.d.ts",
         "{protopath}_grpc_web_pb.js",
         "{protopath}_grpc_web_pb.d.ts",
     ],

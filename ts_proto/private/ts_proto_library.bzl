@@ -216,7 +216,7 @@ def ts_proto_library(name, proto, visibility = None, deps = []):
             proto,
         ],
         # visibility = visibility,
-        verbose = 4,
+        #verbose = 4,
         deps = deps,
         output_mode = "NO_PREFIX_FLAT",
     )

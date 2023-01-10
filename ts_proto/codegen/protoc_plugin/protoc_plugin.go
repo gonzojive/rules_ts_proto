@@ -15,7 +15,6 @@ import (
 
 	"github.com/bazelbuild/rules_go/go/runfiles"
 	"github.com/golang/glog"
-	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/pluginpb"
 )
@@ -122,10 +121,10 @@ func (up *uberPlugin) generateCode(ctx context.Context, req *pluginpb.CodeGenera
 		return resp, nil
 	}
 	importsReplacer := protoImportsReplacer(cfg)
-	defsResp, err := runPluginWithParameter(up.genTSDefsPluginPath, "", importsReplacer)
-	if err != nil {
-		return nil, fmt.Errorf("error running Google's protobuf-javascript codegen plugin: %w", err)
-	}
+	// defsResp, err := runPluginWithParameter(up.genTSDefsPluginPath, "", importsReplacer)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("error running Google's protobuf-javascript codegen plugin: %w", err)
+	// }
 
 	jsResp, err := runPluginWithParameter(up.genJSPluginPath, "import_style=es6,binary", importsReplacer)
 	if err != nil {
@@ -137,16 +136,12 @@ func (up *uberPlugin) generateCode(ctx context.Context, req *pluginpb.CodeGenera
 		return nil, fmt.Errorf("error running grpc definition codegen plugin: %w", err)
 	}
 
-	glog.Infof("got jsResp\n====================\n%s", prototext.Format(jsResp))
-	glog.Infof("got defsResp\n====================\n%s", prototext.Format(defsResp))
-	glog.Infof("got grpcResp\n====================\n%s", prototext.Format(grpcResp))
-
 	errorField := ""
 	if jsResp.GetError() != "" {
 		errorField += fmt.Sprintf("JS code generation error: %s", jsResp.GetError())
 	}
-	if defsResp.GetError() != "" {
-		errorField += fmt.Sprintf("Typescript definition code generation error: %s", jsResp.GetError())
+	if grpcResp.GetError() != "" {
+		errorField += fmt.Sprintf("grpc-web code generation error: %s", jsResp.GetError())
 	}
 	if errorField != "" {
 		return &pluginpb.CodeGeneratorResponse{
@@ -155,7 +150,6 @@ func (up *uberPlugin) generateCode(ctx context.Context, req *pluginpb.CodeGenera
 	}
 	var files []*pluginpb.CodeGeneratorResponse_File
 	files = append(files, jsResp.GetFile()...)
-	files = append(files, defsResp.GetFile()...)
 	files = append(files, grpcResp.GetFile()...)
 
 	glog.Infof("output files: %s", mapSlice(files, func(f *pluginpb.CodeGeneratorResponse_File) string {
@@ -181,12 +175,12 @@ func processGRPCResponse(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.Code
 	// ts-gen-protoc plugin. We still output the file simply for debugging
 	// purposes.
 	filenames := map[string]bool{}
-	for _, f := range resp.GetFile() {
-		filenames[f.GetName()] = true
-		if strings.HasSuffix(f.GetName(), "_pb.d.ts") && !strings.HasSuffix(f.GetName(), "grpc_web_pb.d.ts") {
-			*f.Name = strings.TrimSuffix(f.GetName(), "_pb.d.ts") + "_pb_DEBUG.d.ts"
-		}
-	}
+	// for _, f := range resp.GetFile() {
+	// 	filenames[f.GetName()] = true
+	// 	if strings.HasSuffix(f.GetName(), "_pb.d.ts") && !strings.HasSuffix(f.GetName(), "grpc_web_pb.d.ts") {
+	// 		*f.Name = strings.TrimSuffix(f.GetName(), "_pb.d.ts") + "_pb_DEBUG.d.ts"
+	// 	}
+	// }
 	for _, fileToGenerate := range req.GetFileToGenerate() {
 		serviceJS := fmt.Sprintf("%s_grpc_web_pb.js", strings.TrimSuffix(fileToGenerate, ".proto"))
 		typings := fmt.Sprintf("%s_grpc_web_pb.d.ts", strings.TrimSuffix(fileToGenerate, ".proto"))
@@ -291,13 +285,13 @@ func unmarshalJSON[T any](data []byte) (*T, error) {
 	return &value, nil
 }
 
-var replaceRegex = regexp.MustCompile(`import \{(.*)\} from "(.*)";\s+// proto import: "(.*)"`)
+var replaceRegex = regexp.MustCompile(`import (.*) from ["'](.*)["'];\s+// proto import: "(.*)"`)
 
 func replaceProtoImports(cfg *config, es6Code string) (string, error) {
 	var errors []error
 	updatedCode := replaceRegex.ReplaceAllStringFunc(es6Code, func(importStatement string) string {
 		groups := replaceRegex.FindStringSubmatch(importStatement)
-		aliases := groups[1]
+		aliasesAndWhatnot := groups[1]
 		// currentImport := groups[2]
 		protoImport := groups[3]
 		replacement := cfg.find(protoImport)
@@ -305,8 +299,8 @@ func replaceProtoImports(cfg *config, es6Code string) (string, error) {
 			errors = append(errors, fmt.Errorf("failed to replace import for proto %q; not in import map %+v", protoImport, cfg))
 			return fmt.Sprint("// ERROR: Failed to perform substitution of proto import %q: %s", protoImport, groups[0])
 		}
-		return fmt.Sprintf(`import {%s} from "%s"; // proto import: "%s" - updated by protoc_plugin.go`,
-			aliases, replacement, protoImport)
+		return fmt.Sprintf(`import %s from "%s"; // proto import: "%s" - updated by protoc_plugin.go`,
+			aliasesAndWhatnot, replacement, protoImport)
 	})
 	if len(errors) != 0 {
 		return updatedCode, errors[0]
