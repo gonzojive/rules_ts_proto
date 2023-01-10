@@ -18,6 +18,14 @@ type mappingEntry struct {
 	JSImport    string `json:"js_import"`
 }
 
+func unmarshalJSON[T any](data []byte) (*T, error) {
+	var value T
+	if err := json.Unmarshal(data, &value); err != nil {
+		return nil, fmt.Errorf("error while unmarshaling %T: %w", value, err)
+	}
+	return &value, nil
+}
+
 var (
 	inputPath   = flag.String("input_path", "", "Path to input file.")
 	outputPath  = flag.String("output_path", "", "Output path with updated file.")
@@ -39,12 +47,4 @@ func run(ctx context.Context) error {
 	}
 	glog.Infof("got config: %v", cfg)
 	return nil
-}
-
-func unmarshalJSON[T any](data []byte) (*T, error) {
-	var value T
-	if err := json.Unmarshal(data, &value); err != nil {
-		return nil, fmt.Errorf("error while unmarshaling %T: %w", value, err)
-	}
-	return &value, nil
 }

@@ -3,6 +3,8 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -99,6 +101,12 @@ func loadUberPlugin() (*uberPlugin, error) {
 }
 
 func (up *uberPlugin) generateCode(ctx context.Context, req *pbplugin.CodeGeneratorRequest) (*pbplugin.CodeGeneratorResponse, error) {
+	cfg, err := configFromRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	glog.Infof("got config: %+v", cfg)
+
 	runPluginWithParameter := func(toolPath, param string, postProcessors ...func(req *pbplugin.CodeGeneratorRequest, resp *pbplugin.CodeGeneratorResponse) error) (*pbplugin.CodeGeneratorResponse, error) {
 		req := cloneProto(req)
 		req.Parameter = proto.String(param)
@@ -228,4 +236,47 @@ func runPlugin(ctx context.Context, toolPath string, req *pbplugin.CodeGenerator
 
 func cloneProto[T proto.Message](val T) T {
 	return proto.Clone(val).(T)
+}
+
+type config struct {
+	ActionDescription string         `json:"action_description"`
+	MappingEntries    []mappingEntry `json:"mapping_entries"`
+}
+
+func configFromRequest(req *pbplugin.CodeGeneratorRequest) (*config, error) {
+	for _, param := range strings.Split(req.GetParameter(), ",") {
+		parts := strings.SplitN(param, "=", 2)
+		if parts[0] == "config" {
+			if len(parts) != 2 {
+				return nil, fmt.Errorf("config parameter must be of the form config=")
+			}
+
+			jsonBytes, err := base64.StdEncoding.DecodeString(parts[1])
+			if err != nil {
+				return nil, fmt.Errorf("invalid base64 encoding of config option: %w", err)
+			}
+			cfg, err := unmarshalJSON[config](jsonBytes)
+			if err != nil {
+				return nil, fmt.Errorf("invalid delegating plugin config; see the JSON definition in protoc_plugin.go: %w", err)
+			}
+			return cfg, nil
+		}
+	}
+	if true {
+		return nil, fmt.Errorf("failed to parse parameter %q", req.GetParameter())
+	}
+	return &config{}, nil
+}
+
+type mappingEntry struct {
+	ProtoImport string `json:"proto_import"`
+	JSImport    string `json:"js_import"`
+}
+
+func unmarshalJSON[T any](data []byte) (*T, error) {
+	var value T
+	if err := json.Unmarshal(data, &value); err != nil {
+		return nil, fmt.Errorf("error while unmarshaling %T: %w", value, err)
+	}
+	return &value, nil
 }

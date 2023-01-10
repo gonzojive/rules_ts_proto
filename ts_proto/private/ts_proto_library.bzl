@@ -9,6 +9,7 @@ load(
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@aspect_rules_js//js:libs.bzl", "js_library_lib")
 load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 
 TsProtoInfo = provider(
     "Describes a generated proto library for TypeScript.",
@@ -32,11 +33,6 @@ def _google_js_plugin_compile_impl(ctx):
             - ProtoCompileInfo
             - DefaultInfo
     """
-    base_env = {
-        # Make up for https://github.com/bazelbuild/bazel/issues/15470.
-        "BAZEL_BINDIR": ctx.bin_dir.path,
-    }
-
     # Generate a mapping from proto import path to JS import path.
     #
     # To do this, we need to get the primary_js_file for each proto
@@ -49,17 +45,20 @@ def _google_js_plugin_compile_impl(ctx):
     map_entries = [_import_map_entry(generated_code_dir, dep) for dep in ctx.attr.deps]
     map_entries = [x for x in map_entries if x != None]
 
-    if len(map_entries) == 1:
-        fail("got map entries {}.... from ctx with generated_code_dir {}".format(
-            map_entries,
-            generated_code_dir,
-        ))
+    config_json = json.encode(struct(
+        action_description = "Generating JS/TS code as part of {}".format(ctx.label),
+        mapping_entries = map_entries,
+    ))
 
-    # js_library_files = ctx.attr.js_library[JsInfo].sources.to_list()
+    # Pass
+    options = {
+        Label("//ts_proto/codegen:delegating_plugin"): [
+            "config=" + base64.encode(config_json),
+        ],
+    }
 
-    # Build a map of proto file to
-
-    return proto_compile_impl(ctx, base_env = base_env)
+    # Execute with extracted attrs
+    return proto_compile_impl(ctx, options_override = options)
 
 def _import_map_entry(generated_code_dir, dep):
     #if not (TsProtoInfo in dep):
@@ -71,8 +70,8 @@ def _import_map_entry(generated_code_dir, dep):
         generated_code_dir,
     )
     return struct(
-        proto_import_path = _import_paths_of_direct_sources(proto_info)[0],
-        js_import_path = relative_import,
+        proto_import = _import_paths_of_direct_sources(proto_info)[0],
+        js_import = relative_import,
     )
 
 # based on https://github.com/aspect-build/rules_js/issues/397

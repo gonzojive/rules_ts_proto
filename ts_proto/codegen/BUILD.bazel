@@ -25,6 +25,9 @@ proto_plugin(
 # Plugin that generates type definitions for the google_js_plugin.
 proto_plugin(
     name = "ts_protoc_gen_plugin",
+    env = {
+        "BAZEL_BINDIR": "{bindir}",
+    },
     options = [
         # "import_style=commonjs",
         # "binary",
@@ -56,10 +59,10 @@ proto_plugin(
 
 proto_plugin(
     name = "delegating_plugin",
-    options = [
-        "foo=bar",
-        "binary",
-    ],
+    env = {
+        "BAZEL_BINDIR": "{bindir}",
+    },
+    options = [],
     outputs = [
         "{protopath}_pb.js",
         "{protopath}_pb.d.ts",
