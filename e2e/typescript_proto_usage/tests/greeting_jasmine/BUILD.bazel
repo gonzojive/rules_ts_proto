@@ -2,11 +2,11 @@ load("@aspect_rules_jasmine//jasmine:defs.bzl", "jasmine_test")
 
 jasmine_test(
     name = "test",
+    args = ["*.spec.js"],
+    chdir = package_name(),
     data = [
         "greeting.spec.js",
         "package.json",
         "//:greeting_ts_proto",
     ],
-    args = ["*.spec.js"],
-    chdir = package_name(),
 )
