@@ -1,0 +1,19 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@com_github_gonzojive_rules_ts_proto//ts_proto:defs.bzl", "ts_proto_library")
+
+proto_library(
+    name = "polyline_proto",
+    srcs = ["polyline.proto"],
+    import_prefix = "github.com/gonzojive/rules_ts_proto/example/prefix",
+    visibility = ["//visibility:public"],
+    deps = ["//location:location_proto"],
+)
+
+ts_proto_library(
+    name = "polyline_ts_proto",
+    proto = ":polyline_proto",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//location:location_ts_proto",
+    ],
+)

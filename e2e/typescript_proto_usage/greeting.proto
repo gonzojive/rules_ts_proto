@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package com.example.greeting.v1;
+
+import "github.com/gonzojive/rules_ts_proto/example/prefix/location/location.proto";
+
+option java_multiple_files = true;
+
+message GreetingRequest {
+    string name = 1;
+    .someorg.type.Position origin = 2;
+}
+
+message GreetingResponse {
+    string greeting = 1;
+}
+
+service GreetingService {
+    rpc greet(GreetingRequest) returns (GreetingResponse);
+}

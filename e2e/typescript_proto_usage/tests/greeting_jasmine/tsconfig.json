@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./",
+        "paths": {
+            "*": [
+                "./",
+                "../../bazel-bin/tests/greeting_jasmine",
+            ],
+        }
+    }
+}
