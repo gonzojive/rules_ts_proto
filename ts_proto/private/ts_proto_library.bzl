@@ -158,10 +158,10 @@ def _ts_proto_library_rule_impl(ctx):
     main_library_file = [
         f
         for f in js_library_files
-        if f.path.endswith("_pb.js") and not (f.path.endswith("grpc_web_pb.js"))
+        if f.path.endswith("_pb.mjs") and not (f.path.endswith("grpc_web_pb.mjs"))
     ]
     if len(main_library_file) != 1:
-        fail("expected exactly one file from {} to end in _pb.js, got {}: {}".format(
+        fail("expected exactly one file from {} to end in _pb.mjs, got {}: {}".format(
             ctx.attr.js_library,
             len(main_library_file),
             main_library_file,

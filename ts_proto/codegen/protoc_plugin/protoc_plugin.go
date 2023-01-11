@@ -126,7 +126,7 @@ func (up *uberPlugin) generateCode(ctx context.Context, req *pluginpb.CodeGenera
 	// 	return nil, fmt.Errorf("error running Google's protobuf-javascript codegen plugin: %w", err)
 	// }
 
-	jsResp, err := runPluginWithParameter(up.genJSPluginPath, "import_style=es6,binary", importsReplacer)
+	jsResp, err := runPluginWithParameter(up.genJSPluginPath, "import_style=es6,binary", importsReplacer, ensureMJSExtension)
 	if err != nil {
 		return nil, fmt.Errorf("error running ts definition codegen plugin: %w", err)
 	}
@@ -168,6 +168,17 @@ func mapSlice[T, R any](s []T, f func(elem T) R) []R {
 		out = append(out, f(x))
 	}
 	return out
+}
+
+func ensureMJSExtension(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.CodeGeneratorResponse) error {
+	// Rename the _pb.js to _pb.mjs because ES6 modules are in use.
+	for _, f := range resp.GetFile() {
+		if strings.HasSuffix(f.GetName(), "_pb.js") {
+			*f.Name = strings.TrimSuffix(f.GetName(), "_pb.js") + "_pb.mjs"
+		}
+	}
+
+	return nil
 }
 
 func processGRPCResponse(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.CodeGeneratorResponse) error {
