@@ -81,22 +81,24 @@ load("@com_github_gonzojive_rules_ts_proto//ts_proto:workspace_deps.bzl", "insta
 
 install_rules_ts_proto()
 
+
+load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
+
+npm_translate_lock(
+    name = "example_npm",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+
 load("@rules_ts_proto_npm//:repositories.bzl", "npm_repositories")
 
 npm_repositories()
 
+load("@example_npm//:repositories.bzl", example_npm_repositories = "npm_repositories")
+
+example_npm_repositories()
 
 
-
-
-
-
-
-######### TODO delete below here
-
-
-
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
     name = "aspect_rules_jasmine",
     sha256 = "2c8f22a506a9402a45a9a1fe79f3a34ae3b25499ffcbb12b0b5b18e1fd8f02c1",

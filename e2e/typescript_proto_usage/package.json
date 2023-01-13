@@ -1,3 +1,6 @@
 {
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "google-protobuf": "^3.21.2"
+  }
 }

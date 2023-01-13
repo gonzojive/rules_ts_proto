@@ -5,6 +5,7 @@ load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_gazelle//:def.bzl", "gazelle")
 load("@com_github_gonzojive_rules_ts_proto//ts_proto:defs.bzl", "ts_proto_library")
 load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
+load("@example_npm//:defs.bzl", "npm_link_all_packages")
 
 # Replace with a usage of your rule/macro
 filegroup(name = "empty")
@@ -47,12 +48,12 @@ ts_proto_library(
 
 esbuild(
     name = "lib",
-    srcs = [
-        "program.mjs",
-    ],
     entry_point = "program.mjs",
     deps = [
-        ":greeting_ts_proto",
-        "//location:location_ts_proto",
+        #":greeting_ts_proto",
+        #"//location:location_ts_proto",
+        "//:node_modules/google-protobuf",
     ],
 )
+
+npm_link_all_packages(name = "node_modules")

@@ -1,0 +1,15 @@
+lockfileVersion: 5.4
+
+specifiers:
+  google-protobuf: ^3.21.2
+
+dependencies:
+  google-protobuf: 3.21.2
+
+packages:
+  /google-protobuf/3.21.2:
+    resolution:
+      {
+        integrity: sha512-3MSOYFO5U9mPGikIYCzK0SaThypfGgS6bHqrUGXG3DPHCrb+txNqeEcns1W0lkGfk0rCyNXm7xB9rMxnCiZOoA==,
+      }
+    dev: false
