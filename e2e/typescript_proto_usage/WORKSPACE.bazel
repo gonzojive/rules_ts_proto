@@ -75,7 +75,7 @@ go_rules_dependencies()
 
 go_register_toolchains(version = "1.18.3")
 
-gazelle_dependencies()
+gazelle_dependencies(go_repository_default_config = "//:WORKSPACE.bazel")
 
 load("@com_github_gonzojive_rules_ts_proto//ts_proto:workspace_deps.bzl", "install_rules_ts_proto")
 
@@ -125,3 +125,33 @@ jasmine_repositories(name = "jasmine")
 load("@jasmine//:npm_repositories.bzl", jasmine_npm_repositories = "npm_repositories")
 
 jasmine_npm_repositories()
+
+
+http_archive(
+    name = "aspect_rules_esbuild",
+    sha256 = "3e074ee7be579ceb4f0a664f6ae88fa68926e8eec65ffa067624c5d98c9552f6",
+    strip_prefix = "rules_esbuild-0.13.5",
+    url = "https://github.com/aspect-build/rules_esbuild/archive/refs/tags/v0.13.5.tar.gz",
+)
+
+######################
+# rules_esbuild setup #
+######################
+
+# Fetches the rules_esbuild dependencies.
+# If you want to have a different version of some dependency,
+# you should fetch it *before* calling this.
+# Alternatively, you can skip calling this function, so long as you've
+# already fetched all the dependencies.
+load("@aspect_rules_esbuild//esbuild:dependencies.bzl", "rules_esbuild_dependencies")
+
+rules_esbuild_dependencies()
+
+# If you didn't already register a toolchain providing nodejs, do that:
+# Register a toolchain containing esbuild npm package and native bindings
+load("@aspect_rules_esbuild//esbuild:repositories.bzl", ESBUILD_VERSION = "LATEST_VERSION", "esbuild_register_toolchains")
+
+esbuild_register_toolchains(
+    name = "esbuild",
+    esbuild_version = ESBUILD_VERSION,
+)
