@@ -16,18 +16,13 @@ def rules_ts_proto_internal_deps(name = None):
     Args:
         name: Unused for satisfying buildifier-lint.
     """
-    # http_archive(
-    #     name = "bazel_gazelle",
-    #     sha256 = "448e37e0dbf61d6fa8f00aaa12d191745e14f07c31cabfa731f0c8e8a4f41b97",
-    #     urls = [
-    #         "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.28.0/bazel-gazelle-v0.28.0.tar.gz",
-    #         "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.28.0/bazel-gazelle-v0.28.0.tar.gz",
-    #     ],
-    # )
-
-    native.local_repository(
+    http_archive(
         name = "bazel_gazelle",
-        path = "/home/red/code/bazel-gazelle",
+        sha256 = "448e37e0dbf61d6fa8f00aaa12d191745e14f07c31cabfa731f0c8e8a4f41b97",
+        urls = [
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.28.0/bazel-gazelle-v0.28.0.tar.gz",
+            "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.28.0/bazel-gazelle-v0.28.0.tar.gz",
+        ],
     )
 
     # Override bazel_skylib distribution to fetch sources instead
