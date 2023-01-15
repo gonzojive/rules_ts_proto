@@ -1,0 +1,1 @@
+/home/red/code/protobuf-javascript/google-protobuf.js

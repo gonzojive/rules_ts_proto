@@ -6,6 +6,8 @@ load("@bazel_gazelle//:def.bzl", "gazelle")
 load("@com_github_gonzojive_rules_ts_proto//ts_proto:defs.bzl", "ts_proto_library")
 load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
 load("@example_npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
 
 # Replace with a usage of your rule/macro
 filegroup(name = "empty")
@@ -51,9 +53,33 @@ esbuild(
     entry_point = "program.mjs",
     deps = [
         #":greeting_ts_proto",
-        #"//location:location_ts_proto",
+        "//location:location_ts_proto",
         "//:node_modules/google-protobuf",
     ],
 )
 
+js_binary(
+    # A unique name for this target.
+    name = "main",
+    # The main script which is evaluated by node.js
+    entry_point = "lib.js",
+)
+
+js_binary(
+    # A unique name for this target.
+    name = "main_unbundled",
+    data = [
+        ":greeting_ts_proto",
+        "//:node_modules/google-protobuf",
+        "//location:location_ts_proto",
+    ],
+    # The main script which is evaluated by node.js
+    entry_point = "program.mjs",
+)
+
 npm_link_all_packages(name = "node_modules")
+
+npm_link_package(
+    name = "node_modules/google-protobuf",
+    src = "//google-protobuf-debug:google-protobuf",
+)

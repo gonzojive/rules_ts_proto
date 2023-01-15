@@ -1,0 +1,8 @@
+{
+  "name": "google-protobuf",
+  "files": [
+    "google-protobuf.js",
+    "google-protobuf.js.map"
+  ],
+  "main": "google-protobuf.js"
+}

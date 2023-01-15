@@ -43,10 +43,16 @@ def rules_ts_proto_dependencies():
         remote = "https://github.com/gonzojive/rules_proto_grpc.git",
     )
 
-    local_repository(
+    git_repository(
         name = "com_google_protobuf_javascript",
-        path = "/home/red/code/protobuf-javascript",
+        commit = "e16db874a2f794d249b735c280a570ebeacbf180",
+        remote = "https://github.com/gonzojive/protobuf-javascript.git",
     )
+
+    # local_repository(
+    #     name = "com_google_protobuf_javascript",
+    #     path = "/home/red/code/protobuf-javascript",
+    # )
 
     http_archive(
         name = "rules_proto",
@@ -66,22 +72,34 @@ def rules_ts_proto_dependencies():
         ],
     )
 
-    http_archive(
+    # http_archive(
+    #     name = "aspect_rules_js",
+    #     sha256 = "66ecc9f56300dd63fb86f11cfa1e8affcaa42d5300e2746dba08541916e913fd",
+    #     strip_prefix = "rules_js-1.13.0",
+    #     url = "https://github.com/aspect-build/rules_js/archive/refs/tags/v1.13.0.tar.gz",
+    # )
+
+    git_repository(
         name = "aspect_rules_js",
-        sha256 = "66ecc9f56300dd63fb86f11cfa1e8affcaa42d5300e2746dba08541916e913fd",
-        strip_prefix = "rules_js-1.13.0",
-        url = "https://github.com/aspect-build/rules_js/archive/refs/tags/v1.13.0.tar.gz",
+        commit = "fc9bd0cfc52d0cfbaf69538e6425094bb077afe9",
+        remote = "https://github.com/gonzojive/rules_js.git",
     )
 
     # Sometimes pushed to the reddaly-dev branch of
     # https://github.com/gonzojive/grpc-web.git
-    local_repository(
-        name = "com_github_grpc_grpc_web",
-        path = "/home/red/code/grpc-web",
-    )
+    # local_repository(
+    #     name = "com_github_grpc_grpc_web",
+    #     path = "/home/red/code/grpc-web",
+    # )
 
     # git_repository(
     #     name = "com_github_grpc_grpc_web",
     #     commit = "e49389873d887d15ab2870288f620aa2f15b3b85",
     #     remote = "https://github.com/grpc/grpc-web.git",
     # )
+
+    git_repository(
+        name = "com_github_grpc_grpc_web",
+        commit = "f6eb07753a3d004ea0022eec541bed975e7fa0e8",
+        remote = "https://github.com/gonzojive/grpc-web.git",
+    )
