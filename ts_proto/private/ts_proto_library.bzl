@@ -85,7 +85,7 @@ def _import_map_entry(generated_code_dir, dep):
         return None
     ts_proto_info = dep[TsProtoInfo]
     proto_info = ts_proto_info.proto_info
-    relative_import = _relative_path(
+    relative_import = _relative_path_for_import(
         ts_proto_info.primary_js_file.path,
         generated_code_dir,
     )
@@ -295,9 +295,26 @@ def _import_paths_of_direct_sources(proto_info):
     """
     return [
         # TODO(reddaly): This won't work on windows.
-        paths.relativize(src.path, proto_info.proto_source_root)
+        _relative_path_for_import(src.path, proto_info.proto_source_root)
         for src in proto_info.direct_sources
     ]
+
+def _relative_path_for_import(target, start):
+    """JS import path to `target` from `start`.
+
+    Args:
+      target: path that we want to get relative path to.
+      start: path to directory from which we are starting.
+
+    Returns:
+      string: relative path to `target`.
+    """
+    p = _relative_path(target, start)
+    if p.endswith(".mjs"):
+        return p.removesuffix(".mjs") + ".js"
+    if p.endswith(".cjs"):
+        return p.removesuffix(".cjs") + ".js"
+    return p
 
 # From skylib pull request.
 # https://github.com/bazelbuild/bazel-skylib/pull/44/files
@@ -322,6 +339,8 @@ def _relative_path(target, start):
 
     result = [".."] * (len(s_pieces) - common_part_len)
     result += t_pieces[common_part_len:]
+    if len(result) == 1:
+        result = ["."] + result
 
     return "/".join(result) if len(result) > 0 else "."
 
