@@ -136,12 +136,20 @@ func (up *uberPlugin) generateCode(ctx context.Context, req *pluginpb.CodeGenera
 		return nil, fmt.Errorf("error running grpc definition codegen plugin: %w", err)
 	}
 
+	grpcTypescriptResp, err := runPluginWithParameter(up.genGRPCPluginPath, "import_style=typescript,mode=grpcweb", importsReplacer, grpcWebTypescriptModeProcessor)
+	if err != nil {
+		return nil, fmt.Errorf("error running grpc definition codegen plugin (typescript): %w", err)
+	}
+
 	errorField := ""
 	if jsResp.GetError() != "" {
 		errorField += fmt.Sprintf("JS code generation error: %s", jsResp.GetError())
 	}
 	if grpcResp.GetError() != "" {
 		errorField += fmt.Sprintf("grpc-web code generation error: %s", jsResp.GetError())
+	}
+	if grpcTypescriptResp.GetError() != "" {
+		errorField += fmt.Sprintf("grpc-web code generation error (ts): %s", jsResp.GetError())
 	}
 	if errorField != "" {
 		return &pluginpb.CodeGeneratorResponse{
@@ -151,6 +159,7 @@ func (up *uberPlugin) generateCode(ctx context.Context, req *pluginpb.CodeGenera
 	var files []*pluginpb.CodeGeneratorResponse_File
 	files = append(files, jsResp.GetFile()...)
 	files = append(files, grpcResp.GetFile()...)
+	files = append(files, grpcTypescriptResp.GetFile()...)
 
 	glog.Infof("output files: %s", mapSlice(files, func(f *pluginpb.CodeGeneratorResponse_File) string {
 		return f.GetName()
@@ -331,4 +340,40 @@ func protoImportsReplacer(cfg *config) func(req *pluginpb.CodeGeneratorRequest, 
 		}
 		return nil
 	}
+}
+
+func grpcWebTypescriptModeProcessor(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.CodeGeneratorResponse) error {
+	if len(req.GetFileToGenerate()) != 1 {
+		return fmt.Errorf("not equipped to process more than 1 output file yet, got %v", req.GetFileToGenerate())
+	}
+	updatedName := strings.TrimSuffix(req.GetFileToGenerate()[0], ".proto") + "_grpc_web_pb.ts"
+	var files []*pluginpb.CodeGeneratorResponse_File
+	for _, f := range resp.GetFile() {
+		if strings.HasSuffix(f.GetName(), ".d.ts") {
+			continue
+		}
+		if strings.HasSuffix(f.GetName(), ".ts") {
+			f.Name = &updatedName
+		}
+		files = append(files, f)
+	}
+	resp.File = files
+
+	filenames := map[string]bool{}
+	for _, f := range resp.GetFile() {
+		filenames[f.GetName()] = true
+	}
+	for _, fileToGenerate := range req.GetFileToGenerate() {
+		serviceTS := fmt.Sprintf("%s_grpc_web_pb.ts", strings.TrimSuffix(fileToGenerate, ".proto"))
+		emptyContents := fmt.Sprintf("// GENERATED DO NOT MODIFY\n// empty grpc-web file for %s\n", fileToGenerate)
+
+		if !filenames[serviceTS] {
+			resp.File = append(resp.File, &pluginpb.CodeGeneratorResponse_File{
+				Name:    proto.String(serviceTS),
+				Content: proto.String(emptyContents),
+			})
+		}
+	}
+
+	return nil
 }

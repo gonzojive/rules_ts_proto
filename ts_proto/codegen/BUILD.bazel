@@ -66,6 +66,7 @@ proto_plugin(
         "{protopath}_pb.d.ts",
         "{protopath}_grpc_web_pb.js",
         "{protopath}_grpc_web_pb.d.ts",
+        "{protopath}_grpc_web_pb.ts",
     ],
     tool = "//ts_proto/codegen/protoc_plugin",
     use_built_in_shell_environment = False,

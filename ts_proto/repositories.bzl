@@ -72,18 +72,25 @@ def rules_ts_proto_dependencies():
         ],
     )
 
-    # http_archive(
-    #     name = "aspect_rules_js",
-    #     sha256 = "66ecc9f56300dd63fb86f11cfa1e8affcaa42d5300e2746dba08541916e913fd",
-    #     strip_prefix = "rules_js-1.13.0",
-    #     url = "https://github.com/aspect-build/rules_js/archive/refs/tags/v1.13.0.tar.gz",
-    # )
-
-    git_repository(
-        name = "aspect_rules_js",
-        commit = "fc9bd0cfc52d0cfbaf69538e6425094bb077afe9",
-        remote = "https://github.com/gonzojive/rules_js.git",
+    http_archive(
+        name = "aspect_bazel_lib",
+        sha256 = "79623d656aa23ad3fd4692ab99786c613cd36e49f5566469ed97bc9b4c655f03",
+        strip_prefix = "bazel-lib-1.23.3",
+        url = "https://github.com/aspect-build/bazel-lib/archive/refs/tags/v1.23.3.tar.gz",
     )
+
+    http_archive(
+        name = "aspect_rules_js",
+        sha256 = "9f51475dd2f99abb015939b1cf57ab5f15ef36ca6d2a67104450893fd0aa5c8b",
+        strip_prefix = "rules_js-1.16.0",
+        url = "https://github.com/aspect-build/rules_js/archive/refs/tags/v1.16.0.tar.gz",
+    )
+
+    # git_repository(
+    #     name = "aspect_rules_js",
+    #     commit = "fc9bd0cfc52d0cfbaf69538e6425094bb077afe9",
+    #     remote = "https://github.com/gonzojive/rules_js.git",
+    # )
 
     # Sometimes pushed to the reddaly-dev branch of
     # https://github.com/gonzojive/grpc-web.git
@@ -91,6 +98,14 @@ def rules_ts_proto_dependencies():
     #     name = "com_github_grpc_grpc_web",
     #     path = "/home/red/code/grpc-web",
     # )
+
+    # https://github.com/aspect-build/rules_ts/releases/tag/v1.2.0
+    http_archive(
+        name = "aspect_rules_ts",
+        sha256 = "acb20a4e41295d07441fa940c8da9fd02f8637391fd74a14300586a3ee244d59",
+        strip_prefix = "rules_ts-1.2.0",
+        url = "https://github.com/aspect-build/rules_ts/archive/refs/tags/v1.2.0.tar.gz",
+    )
 
     # git_repository(
     #     name = "com_github_grpc_grpc_web",
