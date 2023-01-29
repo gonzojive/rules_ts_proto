@@ -299,6 +299,9 @@ def _import_paths_of_direct_sources(proto_info):
         for src in proto_info.direct_sources
     ]
 
+# TODO: Come up with a principled way of deciding whether imports get a suffix or not.
+_INCLUDE_SUFFIX_IN_IMPORT = False
+
 def _relative_path_for_import(target, start):
     """JS import path to `target` from `start`.
 
@@ -311,9 +314,13 @@ def _relative_path_for_import(target, start):
     """
     p = _relative_path(target, start)
     if p.endswith(".mjs"):
-        return p.removesuffix(".mjs") + ".js"
+        p = p.removesuffix(".mjs") + ".js"
     if p.endswith(".cjs"):
-        return p.removesuffix(".cjs") + ".js"
+        p = p.removesuffix(".cjs") + ".js"
+
+    if not _INCLUDE_SUFFIX_IN_IMPORT:
+        p = p.removesuffix(".js")
+
     return p
 
 # From skylib pull request.
