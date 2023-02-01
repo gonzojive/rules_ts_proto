@@ -30,6 +30,21 @@ rules_proto_grpc_toolchains()
 
 rules_proto_grpc_repos()
 
+##################
+# rules_ts setup #
+##################
+# Fetches the rules_ts dependencies.
+# If you want to have a different version of some dependency,
+# you should fetch it *before* calling this.
+# Alternatively, you can skip calling this function, so long as you've
+# already fetched all the dependencies.
+load("@aspect_rules_ts//ts:repositories.bzl", "LATEST_VERSION", "rules_ts_dependencies")
+
+rules_ts_dependencies(
+    # Alternatively, you could pick a specific version, or use
+    ts_version = LATEST_VERSION,
+)
+
 # From https://github.com/aspect-build/rules_js/releases/tag/v1.13.0
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
 

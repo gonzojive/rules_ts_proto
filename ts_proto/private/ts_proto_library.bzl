@@ -6,10 +6,10 @@ load(
     "proto_compile_attrs",
     "proto_compile_impl",
 )
-load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@aspect_rules_js//js:libs.bzl", "js_library_lib")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@aspect_bazel_lib//lib:base64.bzl", "base64")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
 
 TsProtoInfo = provider(
     "Describes a generated proto library for TypeScript.",
@@ -23,7 +23,15 @@ TsProtoInfo = provider(
     },
 )
 
-def _google_js_plugin_compile_impl(ctx):
+GeneratedCodeInfo = provider(
+    "Describes the generated TypeScript files that need to be compiled by tsc.",
+    fields = {
+        "ts_files": "ProtoInfo for the library.",
+        "js_files": "Label of the ts_proto_library that produced the generated code.",
+    },
+)
+
+def _ts_proto_library_protoc_plugin_compile_impl(ctx):
     """Implementation function for google_js_plugin_compile.
 
     Args:
@@ -60,7 +68,21 @@ def _google_js_plugin_compile_impl(ctx):
     }
 
     # Execute with extracted attrs
-    return proto_compile_impl(ctx, options_override = options)
+    usual_providers = proto_compile_impl(ctx, options_override = options)
+
+    # Go through the declared outputs to extract a GeneratedCodeInfo.
+    #default_info = [x for x in usual_providers if typeof]
+    #fail("could not extract DefaultInfo from providers {}", usual_providers)
+
+    # The first provider is a ProtoCompileInfo.
+    all_files = usual_providers[0].output_files.to_list()
+
+    return usual_providers + [
+        GeneratedCodeInfo(
+            ts_files = [f for f in all_files if f.path.endswith(".ts")],
+            js_files = [f for f in all_files if not f.path.endswith(".ts")],
+        ),
+    ]
 
 def _this_rule_import_map_entry(ctx):
     """Returns an object that specifies how to import the current rule's messages.
@@ -98,8 +120,13 @@ def _import_map_entry(generated_code_dir, dep):
     )
 
 # based on https://github.com/aspect-build/rules_js/issues/397
-_google_js_plugin_compile = rule(
-    implementation = _google_js_plugin_compile_impl,
+_ts_proto_library_protoc_plugin_compile = rule(
+    doc = """Generates JavaScript and TypeScript files from a .proto file.""",
+    provides = [
+        DefaultInfo,
+        GeneratedCodeInfo,
+    ],
+    implementation = _ts_proto_library_protoc_plugin_compile_impl,
     attrs = dict(
         proto_compile_attrs,
         deps = attr.label_list(
@@ -161,10 +188,11 @@ def _ts_proto_library_rule_impl(ctx):
         if f.path.endswith("_pb.mjs") and not (f.path.endswith("grpc_web_pb.mjs"))
     ]
     if len(main_library_file) != 1:
-        fail("expected exactly one file from {} to end in _pb.mjs, got {}: {}".format(
+        fail("expected exactly one file from {} to end in _pb.mjs, got {}: {} from {}".format(
             ctx.attr.js_library,
             len(main_library_file),
             main_library_file,
+            js_library_files,
         ))
     main_library_file = main_library_file[0]
 
@@ -224,7 +252,39 @@ _ts_proto_library_rule = rule(
     provides = [TsProtoInfo] + js_library_lib.provides,
 )
 
-def ts_proto_library(name, proto, visibility = None, deps = []):
+def default_tsconfig():
+    return {
+        "compilerOptions": {
+            #"allowSyntheticDefaultImports": true,
+            "strict": True,
+            "sourceMap": True,
+            "declaration": True,
+            "declarationMap": True,
+            "importHelpers": True,
+            "target": "es2020",
+            "traceResolution": False,
+            "lib": [
+                "dom",
+                "es5",
+                "es2015.collection",
+                "es2015.iterable",
+                "es2015.promise",
+                "es2019",
+                "es2021",
+                "es2022",
+            ],
+            "module": "ES6",
+            # "moduleResolution": "nodenext", // ECMAScript Module Support.
+            "moduleResolution": "Node",
+            "baseUrl": ".",
+            "paths": {},
+            "typeRoots": [
+                "./node_modules/@types",
+            ],
+        },
+    }
+
+def ts_proto_library(name, proto, visibility = None, deps = [], tsconfig = None):
     """A rule for compiling protobufs into a ts_project.
 
     Args:
@@ -232,9 +292,14 @@ def ts_proto_library(name, proto, visibility = None, deps = []):
         proto: proto_library rule to compile.
         visibility: Visibility of output library.
         deps: TypeScript dependencies.
+        tsconfig: The tsconfig to be passed to ts_project rules.
     """
+    if tsconfig == None:
+        tsconfig = default_tsconfig()
 
-    _google_js_plugin_compile(
+    # Generate the JavaScript and TypeScript code from the protos by running the
+    # protoc_plugin.go code.
+    _ts_proto_library_protoc_plugin_compile(
         name = name + "_compile",
         protos = [
             proto,
@@ -254,19 +319,29 @@ def ts_proto_library(name, proto, visibility = None, deps = []):
         if want_dep not in deps:
             deps.append(want_dep)
 
-    js_library(
-        name = name + "_lib",
+    ts_project(
+        name = name + "_ts_project",
         srcs = [
             name + "_compile",
         ],
         deps = deps,
         visibility = visibility,
+        tsconfig = tsconfig,
     )
+
+    # js_library(
+    #     name = name + "_lib",
+    #     srcs = [
+    #         name + "_compile",
+    #     ],
+    #     deps = deps,
+    #     visibility = visibility,
+    # )
 
     _ts_proto_library_rule(
         name = name,
         proto = proto,
-        js_library = name + "_lib",
+        js_library = name + "_ts_project",
         visibility = visibility,
     )
 
