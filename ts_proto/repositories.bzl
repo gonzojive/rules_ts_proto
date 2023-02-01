@@ -37,10 +37,15 @@ def rules_ts_proto_dependencies():
         ],
     )
 
-    git_repository(
+    # git_repository(
+    #     name = "rules_proto_grpc",
+    #     commit = "1c9e81538467d3809dbf4035007397138a015583",
+    #     remote = "https://github.com/gonzojive/rules_proto_grpc.git",
+    # )
+
+    local_repository(
         name = "rules_proto_grpc",
-        commit = "1c9e81538467d3809dbf4035007397138a015583",
-        remote = "https://github.com/gonzojive/rules_proto_grpc.git",
+        path = "/home/red/code/rules_proto_grpc",
     )
 
     git_repository(

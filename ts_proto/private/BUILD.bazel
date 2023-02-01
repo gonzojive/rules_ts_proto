@@ -5,8 +5,10 @@ bzl_library(
     srcs = ["ts_proto_library.bzl"],
     visibility = ["//ts_proto:__subpackages__"],
     deps = [
+        "@aspect_bazel_lib//lib:base64",
         "@aspect_rules_js//js:defs",
         "@aspect_rules_js//js:libs",
+        "@aspect_rules_ts//ts:defs",
         "@bazel_skylib//lib:paths",
         "@rules_proto_grpc//:defs",
     ],
