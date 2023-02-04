@@ -131,7 +131,7 @@ func (up *uberPlugin) generateCode(ctx context.Context, req *pluginpb.CodeGenera
 		return nil, fmt.Errorf("error running ts definition codegen plugin: %w", err)
 	}
 
-	grpcResp, err := runPluginWithParameter(up.genGRPCPluginPath, "import_style=es6+dts,mode=grpcweb", processGRPCResponse, importsReplacer)
+	grpcResp, err := runPluginWithParameter(up.genGRPCPluginPath, "import_style=commonjs+dts,mode=grpcweb", processGRPCResponse, importsReplacer)
 	if err != nil {
 		return nil, fmt.Errorf("error running grpc definition codegen plugin: %w", err)
 	}
@@ -190,6 +190,8 @@ func ensureMJSExtension(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.CodeG
 	return nil
 }
 
+const dontGenerateJS = true
+
 func processGRPCResponse(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.CodeGeneratorResponse) error {
 	// Rename the _pb.ts.d file because it conflicts with the output of the
 	// ts-gen-protoc plugin. We still output the file simply for debugging
@@ -204,6 +206,19 @@ func processGRPCResponse(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.Code
 	for _, fileToGenerate := range req.GetFileToGenerate() {
 		serviceJS := fmt.Sprintf("%s_grpc_web_pb.js", strings.TrimSuffix(fileToGenerate, ".proto"))
 		typings := fmt.Sprintf("%s_grpc_web_pb.d.ts", strings.TrimSuffix(fileToGenerate, ".proto"))
+
+		if dontGenerateJS {
+			resp.File = filter(resp.File, func(f *pluginpb.CodeGeneratorResponse_File) bool {
+				switch f.GetName() {
+				case serviceJS, typings:
+					return false
+				default:
+					return true
+				}
+			})
+			continue
+		}
+
 		emptyContents := fmt.Sprintf("// GENERATED DO NOT MODIFY\n// empty grpc-web file for %s\n", fileToGenerate)
 
 		if !filenames[serviceJS] {
@@ -376,4 +391,14 @@ func grpcWebTypescriptModeProcessor(req *pluginpb.CodeGeneratorRequest, resp *pl
 	}
 
 	return nil
+}
+
+func filter[T any](values []T, allow func(T) bool) []T {
+	var out []T
+	for _, v := range values {
+		if allow(v) {
+			out = append(out, v)
+		}
+	}
+	return out
 }

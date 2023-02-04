@@ -8,61 +8,31 @@ def _filtered_files_impl(ctx):
 
     Returns:
         Providers:
-            - ProtoCompileInfo
             - DefaultInfo
     """
 
     # Could probably also use ctx.attr.js_library[DefaultInfo].files.to_list()
-    js_library_files = ctx.attr.js_library[DefaultInfo].files.to_list()
+    all_files = []
+    for src in ctx.attr.srcs:
+        all_files += src[DefaultInfo].files.to_list()
 
-    main_library_file = [
+    def filter(f):
+        passed = True
+        if ctx.attr.filter == "ts":
+            passed = f.path.endswith(".ts")
+        if ctx.attr.invert:
+            passed = not passed
+        return passed
+
+    passed_files = [
         f
-        for f in js_library_files
-        if f.path.endswith("_pb.mjs") and not (f.path.endswith("grpc_web_pb.mjs"))
+        for f in all_files
+        if filter(f)
     ]
-    if len(main_library_file) != 1:
-        fail("expected exactly one file from {} to end in _pb.mjs, got {}: {} from {}".format(
-            ctx.attr.js_library,
-            len(main_library_file),
-            main_library_file,
-            js_library_files,
-        ))
-    main_library_file = main_library_file[0]
-
-    grpc_web_library_file = [
-        f
-        for f in js_library_files
-        if f.path.endswith("_grpc_web_pb.js")
-    ]
-    if len(grpc_web_library_file) != 1:
-        fail("expected exactly one file from {} to end in _pb.js, got {}: {}".format(
-            ctx.attr.js_library,
-            len(grpc_web_library_file),
-            grpc_web_library_file,
-        ))
-    grpc_web_library_file = grpc_web_library_file[0]
-
-    proto_info = ctx.attr.proto[ProtoInfo]
-    if len(proto_info.direct_sources) != 1:
-        fail(
-            "expected proto_library {} to have exactly 1 srcs, got {}: {}",
-            ctx.attr.proto,
-            len(proto_info.direct_sources),
-            proto_info.direct_sources,
-        )
 
     return [
-        # Provide everything from the js_library of generated files.
-        ctx.attr.js_library[provider]
-        for provider in js_library_lib.provides
-    ] + [
-        # Also provide TsProtoInfo.
-        TsProtoInfo(
-            proto_info = ctx.attr.proto[ProtoInfo],
-            ts_proto_library_label = ctx.label,
-            #js_info = ctx.attr.js_library[JsInfo],
-            primary_js_file = main_library_file,
-            grpc_web_js_file = grpc_web_library_file,
+        DefaultInfo(
+            files = depset(direct = passed_files),
         ),
     ]
 

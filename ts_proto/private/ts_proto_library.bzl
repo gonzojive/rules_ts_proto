@@ -7,9 +7,12 @@ load(
     "proto_compile_impl",
 )
 load("@aspect_rules_js//js:libs.bzl", "js_library_lib")
+
+#load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+load(":filtered_files.bzl", "filtered_files")
 
 TsProtoInfo = provider(
     "Describes a generated proto library for TypeScript.",
@@ -60,7 +63,6 @@ def _ts_proto_library_protoc_plugin_compile_impl(ctx):
         mapping_entries = map_entries,
     ))
 
-    # Pass
     options = {
         Label("//ts_proto/codegen:delegating_plugin"): [
             "config=" + base64.encode(config_json),
@@ -310,6 +312,22 @@ def ts_proto_library(name, proto, visibility = None, deps = [], tsconfig = None)
         output_mode = "NO_PREFIX_FLAT",
     )
 
+    ts_files = name + "_ts_files"
+    non_ts_files = name + "_js_files"
+
+    filtered_files(
+        name = ts_files,
+        srcs = [name + "_compile"],
+        filter = "ts",
+    )
+
+    filtered_files(
+        name = non_ts_files,
+        srcs = [name + "_compile"],
+        filter = "ts",
+        invert = True,
+    )
+
     implicit_deps = [
         "@com_github_gonzojive_rules_ts_proto//:node_modules/@types/google-protobuf",
         "@com_github_gonzojive_rules_ts_proto//:node_modules/google-protobuf",
@@ -319,24 +337,24 @@ def ts_proto_library(name, proto, visibility = None, deps = [], tsconfig = None)
         if want_dep not in deps:
             deps.append(want_dep)
 
-    ts_project(
-        name = name + "_ts_project",
-        srcs = [
-            name + "_compile",
-        ],
-        deps = deps,
-        visibility = visibility,
-        tsconfig = tsconfig,
-    )
-
     # js_library(
-    #     name = name + "_lib",
-    #     srcs = [
-    #         name + "_compile",
-    #     ],
+    #     name = name + "_partial_js_lib",
+    #     srcs = [non_ts_files],
     #     deps = deps,
     #     visibility = visibility,
     # )
+
+    ts_project(
+        name = name + "_ts_project",
+        srcs = [
+            ts_files,
+        ],
+        assets = [
+            non_ts_files,
+        ],
+        deps = deps,
+        tsconfig = tsconfig,
+    )
 
     _ts_proto_library_rule(
         name = name,
