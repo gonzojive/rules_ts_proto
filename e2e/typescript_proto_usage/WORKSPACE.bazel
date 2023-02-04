@@ -79,8 +79,11 @@ gazelle_dependencies(go_repository_default_config = "//:WORKSPACE.bazel")
 
 load("@com_github_gonzojive_rules_ts_proto//ts_proto:workspace_deps.bzl", "install_rules_ts_proto")
 
-install_rules_ts_proto()
-
+install_rules_ts_proto(
+    dep_targets = {
+        "google-protobuf": "//:node_modules/google-protobuf",
+    },
+)
 
 load("@aspect_rules_js//npm:npm_import.bzl", "npm_translate_lock")
 
@@ -97,7 +100,6 @@ npm_repositories()
 load("@example_npm//:repositories.bzl", example_npm_repositories = "npm_repositories")
 
 example_npm_repositories()
-
 
 http_archive(
     name = "aspect_rules_jasmine",
@@ -128,7 +130,6 @@ load("@jasmine//:npm_repositories.bzl", jasmine_npm_repositories = "npm_reposito
 
 jasmine_npm_repositories()
 
-
 # http_archive(
 #     name = "aspect_rules_esbuild",
 #     sha256 = "3e074ee7be579ceb4f0a664f6ae88fa68926e8eec65ffa067624c5d98c9552f6",
@@ -156,7 +157,7 @@ rules_esbuild_dependencies()
 
 # If you didn't already register a toolchain providing nodejs, do that:
 # Register a toolchain containing esbuild npm package and native bindings
-load("@aspect_rules_esbuild//esbuild:repositories.bzl", ESBUILD_VERSION = "LATEST_VERSION", "esbuild_register_toolchains")
+load("@aspect_rules_esbuild//esbuild:repositories.bzl", "esbuild_register_toolchains", ESBUILD_VERSION = "LATEST_VERSION")
 
 esbuild_register_toolchains(
     name = "esbuild",

@@ -4,6 +4,7 @@ load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_gazelle//:def.bzl", "gazelle")
 load("@com_github_gonzojive_rules_ts_proto//ts_proto:defs.bzl", "ts_proto_library")
+load("@rules_ts_proto_npm//:defs.bzl", "npm_link_all_packages")
 
 # Replace with a usage of your rule/macro
 filegroup(name = "empty")
@@ -39,3 +40,5 @@ ts_proto_library(
         "//location:location_ts_proto",
     ],
 )
+
+npm_link_all_packages(name = "node_modules")

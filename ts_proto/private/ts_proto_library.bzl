@@ -12,6 +12,7 @@ load("@aspect_rules_js//js:libs.bzl", "js_library_lib")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@aspect_bazel_lib//lib:base64.bzl", "base64")
 load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+load("@com_github_gonzojive_rules_ts_proto_config//:ts_proto_library_config.bzl", "JS_IMPORT_BAZEL_TARGET_MAP")
 load(":filtered_files.bzl", "filtered_files")
 
 TsProtoInfo = provider(
@@ -329,8 +330,8 @@ def ts_proto_library(name, proto, visibility = None, deps = [], tsconfig = None)
     )
 
     implicit_deps = [
-        "@com_github_gonzojive_rules_ts_proto//:node_modules/@types/google-protobuf",
-        "@com_github_gonzojive_rules_ts_proto//:node_modules/google-protobuf",
+        JS_IMPORT_BAZEL_TARGET_MAP[dep_package_name]
+        for dep_package_name in ["google-protobuf", "@types/google-protobuf"]
     ]
     deps = [x for x in deps]
     for want_dep in implicit_deps:

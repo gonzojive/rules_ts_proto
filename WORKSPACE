@@ -88,7 +88,11 @@ register_copy_to_directory_toolchains()
 
 load("//ts_proto:workspace_deps.bzl", "install_rules_ts_proto")
 
-install_rules_ts_proto()
+install_rules_ts_proto(
+    dep_targets = {
+        "google-protobuf": "//:node_modules/google-protobuf",
+    },
+)
 
 load("@rules_ts_proto_npm//:repositories.bzl", "npm_repositories")
 
