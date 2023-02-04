@@ -19,11 +19,20 @@ def _config_bzl_contents(js_import_bazel_target_map):
             keys = missing_keys,
         ))
 
+    normalized_map = {}
+    for (key, val) in js_import_bazel_target_map.items():
+        if val == None:
+            normalized_map[key] = []
+        elif type(val) == "string":
+            normalized_map[key] = [val]
+        else:
+            normalized_map[key] = val
+
     return """
 
 JS_IMPORT_BAZEL_TARGET_MAP = {map}
 
-""".format(map = json.encode(js_import_bazel_target_map))
+""".format(map = json.encode(normalized_map))
 
 def _config_repository_impl(repo_ctx):
     repo_ctx.file("ts_proto_library_config.bzl", repo_ctx.attr.bzl_contents)
