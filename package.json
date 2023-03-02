@@ -9,8 +9,8 @@
     "yarn": ">=1.9.2"
   },
   "devDependencies": {
-    "@types/google-protobuf": "^3.15.6",
-    "google-protobuf": "^3.21.2",
-    "ts-protoc-gen": "^0.15.0"
+    "@types/google-protobuf": "3.15.6",
+    "google-protobuf": "3.21.2",
+    "ts-protoc-gen": "https://github.com/TapestryEnergy/ts-protoc-gen"
   }
 }
