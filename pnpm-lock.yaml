@@ -1,36 +1,32 @@
 lockfileVersion: 5.4
 
 specifiers:
-  "@types/google-protobuf": ^3.15.6
-  google-protobuf: ^3.21.2
-  ts-protoc-gen: ^0.15.0
+  '@types/google-protobuf': 3.15.6
+  google-protobuf: 3.21.2
+  ts-protoc-gen: https://github.com/TapestryEnergy/ts-protoc-gen
 
 devDependencies:
-  "@types/google-protobuf": 3.15.6
+  '@types/google-protobuf': 3.15.6
   google-protobuf: 3.21.2
-  ts-protoc-gen: 0.15.0
+  ts-protoc-gen: github.com/TapestryEnergy/ts-protoc-gen/e061ec801324ba30868b7566a2bfabc32bdb03e6
 
 packages:
+
   /@types/google-protobuf/3.15.6:
-    resolution:
-      {
-        integrity: sha512-pYVNNJ+winC4aek+lZp93sIKxnXt5qMkuKmaqS3WGuTq0Bw1ZDYNBgzG5kkdtwcv+GmYJGo3yEg6z2cKKAiEdw==,
-      }
+    resolution: {integrity: sha512-pYVNNJ+winC4aek+lZp93sIKxnXt5qMkuKmaqS3WGuTq0Bw1ZDYNBgzG5kkdtwcv+GmYJGo3yEg6z2cKKAiEdw==}
     dev: true
 
   /google-protobuf/3.21.2:
-    resolution:
-      {
-        integrity: sha512-3MSOYFO5U9mPGikIYCzK0SaThypfGgS6bHqrUGXG3DPHCrb+txNqeEcns1W0lkGfk0rCyNXm7xB9rMxnCiZOoA==,
-      }
+    resolution: {integrity: sha512-3MSOYFO5U9mPGikIYCzK0SaThypfGgS6bHqrUGXG3DPHCrb+txNqeEcns1W0lkGfk0rCyNXm7xB9rMxnCiZOoA==}
     dev: true
 
-  /ts-protoc-gen/0.15.0:
-    resolution:
-      {
-        integrity: sha512-TycnzEyrdVDlATJ3bWFTtra3SCiEP0W0vySXReAuEygXCUr1j2uaVyL0DhzjwuUdQoW5oXPwk6oZWeA0955V+g==,
-      }
+  github.com/TapestryEnergy/ts-protoc-gen/e061ec801324ba30868b7566a2bfabc32bdb03e6:
+    resolution: {tarball: https://codeload.github.com/TapestryEnergy/ts-protoc-gen/tar.gz/e061ec801324ba30868b7566a2bfabc32bdb03e6}
+    name: ts-protoc-gen
+    version: 0.15.1-pre
     hasBin: true
+    prepare: true
+    requiresBuild: true
     dependencies:
       google-protobuf: 3.21.2
     dev: true
