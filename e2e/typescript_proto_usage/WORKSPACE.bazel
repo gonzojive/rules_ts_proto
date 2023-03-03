@@ -82,6 +82,7 @@ load("@com_github_gonzojive_rules_ts_proto//ts_proto:workspace_deps.bzl", "insta
 install_rules_ts_proto(
     dep_targets = {
         "google-protobuf": "//:node_modules/google-protobuf",
+        "@types/google-protobuf": "//:node_modules/@types/google-protobuf",
     },
 )
 
@@ -130,17 +131,17 @@ load("@jasmine//:npm_repositories.bzl", jasmine_npm_repositories = "npm_reposito
 
 jasmine_npm_repositories()
 
-# http_archive(
-#     name = "aspect_rules_esbuild",
-#     sha256 = "3e074ee7be579ceb4f0a664f6ae88fa68926e8eec65ffa067624c5d98c9552f6",
-#     strip_prefix = "rules_esbuild-0.13.5",
-#     url = "https://github.com/aspect-build/rules_esbuild/archive/refs/tags/v0.13.5.tar.gz",
-# )
-
-local_repository(
+http_archive(
     name = "aspect_rules_esbuild",
-    path = "/home/red/code/rules_esbuild",
+    sha256 = "3e074ee7be579ceb4f0a664f6ae88fa68926e8eec65ffa067624c5d98c9552f6",
+    strip_prefix = "rules_esbuild-0.13.5",
+    url = "https://github.com/aspect-build/rules_esbuild/archive/refs/tags/v0.13.5.tar.gz",
 )
+
+#local_repository(
+#    name = "aspect_rules_esbuild",
+#    path = "/home/red/code/rules_esbuild",
+#)
 
 ######################
 # rules_esbuild setup #

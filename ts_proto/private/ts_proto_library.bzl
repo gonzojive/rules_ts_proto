@@ -311,7 +311,7 @@ def ts_proto_library(name, proto, visibility = None, deps = [], tsconfig = None)
         # visibility = visibility,
         #verbose = 4,
         deps = deps,
-        output_mode = "NO_PREFIX",
+        output_mode = "NO_PREFIX_FLAT",
     )
 
     ts_files = name + "_ts_files"
@@ -356,6 +356,9 @@ def ts_proto_library(name, proto, visibility = None, deps = [], tsconfig = None)
         ],
         deps = deps,
         tsconfig = tsconfig,
+        source_map = True,
+        declaration = True,
+        declaration_map = True,
     )
 
     _ts_proto_library_rule(
