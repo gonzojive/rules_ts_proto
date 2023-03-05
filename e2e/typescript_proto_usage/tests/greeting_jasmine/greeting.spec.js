@@ -1,5 +1,5 @@
-//import { GreetingRequest } from "../../greeting_pb.js"
-import { GreetingRequest } from "../../greeting_pb.mjs";
+import { GreetingRequest } from "../../greeting_pb.mjs"
+//import { GreetingRequest } from "../../greeting_pb";
 
 function say_hi() {
   return new GreetingRequest().setGreeting("hello").getGreeting();

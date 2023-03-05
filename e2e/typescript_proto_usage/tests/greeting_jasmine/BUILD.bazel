@@ -9,4 +9,5 @@ jasmine_test(
         "package.json",
         "//:greeting_ts_proto",
     ],
+    module = "esm",
 )

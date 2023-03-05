@@ -58,6 +58,7 @@ nodejs_register_toolchains(
 )
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
     name = "io_bazel_rules_go",
@@ -117,11 +118,17 @@ load("@example_npm//:repositories.bzl", example_npm_repositories = "npm_reposito
 
 example_npm_repositories()
 
-http_archive(
+# http_archive(
+#     name = "aspect_rules_jasmine",
+#     sha256 = "b3b2ff30ed222db653092d8280e0b62a4d54c5e65c598df09a0a1d7aae78fc8f",
+#     strip_prefix = "rules_jasmine-0.3.1",
+#     url = "https://github.com/aspect-build/rules_jasmine/releases/download/v0.3.1/rules_jasmine-v0.3.1.tar.gz",
+# )
+
+git_repository(
     name = "aspect_rules_jasmine",
-    sha256 = "2c8f22a506a9402a45a9a1fe79f3a34ae3b25499ffcbb12b0b5b18e1fd8f02c1",
-    strip_prefix = "rules_jasmine-0.2.4",
-    url = "https://github.com/aspect-build/rules_jasmine/archive/refs/tags/v0.2.4.tar.gz",
+    commit = "70206648d9a853551dcfa23a626e6de7d6280303",
+    remote = "https://github.com/dgp1130/rules_jasmine.git",
 )
 
 ######################
