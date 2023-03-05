@@ -83,10 +83,17 @@ def _ts_proto_library_protoc_plugin_compile_impl(ctx):
 
     return usual_providers + [
         GeneratedCodeInfo(
-            ts_files = [f for f in all_files if f.path.endswith(".ts")],
-            js_files = [f for f in all_files if not f.path.endswith(".ts")],
+            ts_files = [f for f in all_files if _has_typescript_extension(f.path)],
+            js_files = [f for f in all_files if not _has_typescript_extension(f.path)],
         ),
     ]
+
+def _has_typescript_extension(path_string):
+    return (
+        path_string.endswith(".ts") or
+        path_string.endswith(".mts") or
+        path_string.endswith(".cts")
+    )
 
 def _this_rule_import_map_entry(ctx):
     """Returns an object that specifies how to import the current rule's messages.
@@ -115,6 +122,8 @@ def _import_map_entry(generated_code_dir, dep):
         ts_proto_info.primary_js_file.path,
         generated_code_dir,
     )
+
+    #fail("relative_import = {}\ntarget = {}\ndir =    {}".format(relative_import, ts_proto_info.primary_js_file.path, generated_code_dir))
     return struct(
         proto_import = _import_paths_of_direct_sources(proto_info)[0],
         js_import = relative_import,
@@ -203,10 +212,10 @@ def _ts_proto_library_rule_impl(ctx):
     grpc_web_library_file = [
         f
         for f in js_library_files
-        if f.path.endswith("_grpc_web_pb.js")
+        if f.path.endswith("_grpc_web_pb.mjs")
     ]
     if len(grpc_web_library_file) != 1:
-        fail("expected exactly one file from {} to end in _pb.js, got {}: {}".format(
+        fail("expected exactly one file from {} to end in _grpc_web_pb.mjs, got {}: {}".format(
             ctx.attr.js_library,
             len(grpc_web_library_file),
             grpc_web_library_file,
@@ -390,12 +399,15 @@ def _import_paths_of_direct_sources(proto_info):
     """
     return [
         # TODO(reddaly): This won't work on windows.
-        _relative_path_for_import(src.path, proto_info.proto_source_root)
+        # _relative_path_for_import just happens to do the right thing for .protos, but it
+        # was written for resolving relative TypeScript imports. The leading ./ must be removed,
+        # which is necessary in TypeScript imports.
+        _relative_path_for_import(src.path, proto_info.proto_source_root).removeprefix("./")
         for src in proto_info.direct_sources
     ]
 
 # TODO: Come up with a principled way of deciding whether imports get a suffix or not.
-_INCLUDE_SUFFIX_IN_IMPORT = False
+_INCLUDE_SUFFIX_IN_IMPORT = True
 
 def _relative_path_for_import(target, start):
     """JS import path to `target` from `start`.
@@ -408,15 +420,18 @@ def _relative_path_for_import(target, start):
       string: relative path to `target`.
     """
     p = relative_path(target, start)
+    if _INCLUDE_SUFFIX_IN_IMPORT:
+        #fail("relative_path({}, {}) = {}".format(target, start, p))
+        return p
+
     if p.endswith(".mjs"):
-        p = p.removesuffix(".mjs") + ".js"
+        return p.removesuffix(".mjs")
     if p.endswith(".cjs"):
-        p = p.removesuffix(".cjs") + ".js"
+        return p.removesuffix(".cjs")
+    if p.endswith(".js"):
+        return p.removesuffix(".js")
 
-    if not _INCLUDE_SUFFIX_IN_IMPORT:
-        p = p.removesuffix(".js")
-
-    return p
+    fail("Unknown file extension of JavaScript dependency - likely an error in rules_ts_proto: {}".format(p))
 
 def _label_for_printing(label):
     return "{}".format(label)

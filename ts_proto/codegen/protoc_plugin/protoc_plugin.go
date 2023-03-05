@@ -193,24 +193,29 @@ func ensureMJSExtension(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.CodeG
 const dontGenerateJS = true
 
 func processGRPCResponse(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.CodeGeneratorResponse) error {
-	// Rename the _pb.ts.d file because it conflicts with the output of the
-	// ts-gen-protoc plugin. We still output the file simply for debugging
-	// purposes.
 	filenames := map[string]bool{}
 	for _, f := range resp.GetFile() {
 		filenames[f.GetName()] = true
-		// if strings.HasSuffix(f.GetName(), "_pb.d.ts") && !strings.HasSuffix(f.GetName(), "grpc_web_pb.d.ts") {
-		// 	*f.Name = strings.TrimSuffix(f.GetName(), "_pb.d.ts") + "_pb_DEBUG.d.ts"
-		// }
 	}
 	for _, fileToGenerate := range req.GetFileToGenerate() {
 		serviceJS := fmt.Sprintf("%s_grpc_web_pb.js", strings.TrimSuffix(fileToGenerate, ".proto"))
-		typings := fmt.Sprintf("%s_grpc_web_pb.d.ts", strings.TrimSuffix(fileToGenerate, ".proto"))
+		serviceTypings := fmt.Sprintf("%s_grpc_web_pb.d.ts", strings.TrimSuffix(fileToGenerate, ".proto"))
+		messageTypingsDTS := fmt.Sprintf("%s_pb.d.ts", strings.TrimSuffix(fileToGenerate, ".proto"))
+		messageTypingsDMTS := fmt.Sprintf("%s_pb.d.mts", strings.TrimSuffix(fileToGenerate, ".proto"))
+
+		if msg := findResponseFileByName(resp, messageTypingsDTS); msg != nil {
+			msg.Name = proto.String(messageTypingsDMTS)
+		} else {
+			return fmt.Errorf("grpc-web plugin unexpectedly did not output %q; outputs: %s", messageTypingsDTS,
+				strings.Join(
+					mapSlice(resp.GetFile(), func(f *pluginpb.CodeGeneratorResponse_File) string { return fmt.Sprintf("%q", f.GetName()) }),
+					", "))
+		}
 
 		if dontGenerateJS {
 			resp.File = filter(resp.File, func(f *pluginpb.CodeGeneratorResponse_File) bool {
 				switch f.GetName() {
-				case serviceJS, typings:
+				case serviceJS, serviceTypings:
 					return false
 				default:
 					return true
@@ -227,14 +232,23 @@ func processGRPCResponse(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.Code
 				Content: proto.String(emptyContents),
 			})
 		}
-		if !filenames[typings] {
+		if !filenames[serviceTypings] {
 			resp.File = append(resp.File, &pluginpb.CodeGeneratorResponse_File{
-				Name:    proto.String(typings),
+				Name:    proto.String(serviceTypings),
 				Content: proto.String(emptyContents),
 			})
 		}
 	}
 
+	return nil
+}
+
+func findResponseFileByName(resp *pluginpb.CodeGeneratorResponse, name string) *pluginpb.CodeGeneratorResponse_File {
+	for _, f := range resp.File {
+		if f.GetName() == name {
+			return f
+		}
+	}
 	return nil
 }
 
@@ -361,13 +375,13 @@ func grpcWebTypescriptModeProcessor(req *pluginpb.CodeGeneratorRequest, resp *pl
 	if len(req.GetFileToGenerate()) != 1 {
 		return fmt.Errorf("not equipped to process more than 1 output file yet, got %v", req.GetFileToGenerate())
 	}
-	updatedName := strings.TrimSuffix(req.GetFileToGenerate()[0], ".proto") + "_grpc_web_pb.ts"
+	updatedName := strings.TrimSuffix(req.GetFileToGenerate()[0], ".proto") + "_grpc_web_pb.mts"
 	var files []*pluginpb.CodeGeneratorResponse_File
 	for _, f := range resp.GetFile() {
 		if strings.HasSuffix(f.GetName(), ".d.ts") {
 			continue
 		}
-		if strings.HasSuffix(f.GetName(), ".ts") {
+		if strings.HasSuffix(f.GetName(), ".ts") || strings.HasSuffix(f.GetName(), ".mts") {
 			f.Name = &updatedName
 		}
 		files = append(files, f)
@@ -379,7 +393,7 @@ func grpcWebTypescriptModeProcessor(req *pluginpb.CodeGeneratorRequest, resp *pl
 		filenames[f.GetName()] = true
 	}
 	for _, fileToGenerate := range req.GetFileToGenerate() {
-		serviceTS := fmt.Sprintf("%s_grpc_web_pb.ts", strings.TrimSuffix(fileToGenerate, ".proto"))
+		serviceTS := fmt.Sprintf("%s_grpc_web_pb.mts", strings.TrimSuffix(fileToGenerate, ".proto"))
 		emptyContents := fmt.Sprintf("// GENERATED DO NOT MODIFY\n// empty grpc-web file for %s\n", fileToGenerate)
 
 		if !filenames[serviceTS] {

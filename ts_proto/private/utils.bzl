@@ -30,7 +30,7 @@ def relative_path(target, start):
 
     result = [".."] * (len(s_pieces) - common_part_len)
     result += t_pieces[common_part_len:]
-    if len(result) == 1:
+    if result[0] != ".." and result[0] != ".":
         result = ["."] + result
 
     result = "/".join(result) if len(result) > 0 else "."

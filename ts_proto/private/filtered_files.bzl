@@ -19,7 +19,7 @@ def _filtered_files_impl(ctx):
     def filter(f):
         passed = True
         if ctx.attr.filter == "ts":
-            passed = f.path.endswith(".ts")
+            passed = f.path.endswith(".ts") or f.path.endswith(".mts")
         if ctx.attr.invert:
             passed = not passed
         return passed

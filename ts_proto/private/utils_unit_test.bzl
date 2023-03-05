@@ -9,6 +9,7 @@ def _myhelper_test_impl(ctx):
     asserts.equals(env, "./bar.xyz", relative_path("foo/bar.xyz", "foo"))
     asserts.equals(env, "./bar.xyz", relative_path("foo/bar.xyz", "foo/"))
     asserts.equals(env, "./bar.xyz", relative_path("foo/bar.xyz/", "foo/"))
+    asserts.equals(env, "./location/location_pb.mjs", relative_path("bazel-out/k8-fastbuild/bin/location/location_pb.mjs", "bazel-out/k8-fastbuild/bin/"))
     return unittest.end(env)
 
 myhelper_test = unittest.make(_myhelper_test_impl)
