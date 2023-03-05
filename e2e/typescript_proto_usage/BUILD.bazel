@@ -5,9 +5,10 @@ load("@bazel_skylib//rules:build_test.bzl", "build_test")
 load("@bazel_gazelle//:def.bzl", "gazelle")
 load("@com_github_gonzojive_rules_ts_proto//ts_proto:defs.bzl", "ts_proto_library")
 load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
-load("@example_npm//:defs.bzl", "npm_link_all_packages")
+load("@example_npm//:defs.bzl", example_npm_link_all_packages = "npm_link_all_packages")
+
+#load("@rules_ts_proto_npm//:defs.bzl", ts_proto_link_all_packages = "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_binary")
-load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
 
 # Replace with a usage of your rule/macro
 filegroup(name = "empty")
@@ -77,9 +78,11 @@ js_binary(
     entry_point = "program.mjs",
 )
 
-npm_link_all_packages(name = "node_modules")
+example_npm_link_all_packages(name = "node_modules")
 
-npm_link_package(
-    name = "node_modules/google-protobuf",
-    src = "//google-protobuf-debug:google-protobuf",
-)
+#ts_proto_link_all_packages(name = "node_modules")
+
+# npm_link_package(
+#     name = "node_modules/google-protobuf",
+#     src = "//google-protobuf-debug:google-protobuf",
+# )
