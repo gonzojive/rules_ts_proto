@@ -11,8 +11,9 @@ describe("lib", () => {
   });
 
   it("should be serializable", () => {
-    const request = new GreetingRequest();
-    expect(request.serializeBinary()).toBe("non empty");
+    const request = new GreetingRequest().setName("hello");
+    const requestRoundtripped = GreetingRequest.deserializeBinary(request.serializeBinary());
+    expect(requestRoundtripped.getName()).toBe("hello");
   });
 });
 

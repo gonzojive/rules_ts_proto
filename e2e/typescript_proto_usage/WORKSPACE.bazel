@@ -6,12 +6,6 @@ local_repository(
 
 #---SNIP--- Below here is re-used in the workspace snippet published on releases
 
-local_repository(
-    # DO NOT SUBMIT
-    name = "com_google_protobuf_javascript",
-    path = "/home/red/code/protobuf-javascript",
-)
-
 ######################
 # rules_ts_proto setup #
 ######################
