@@ -288,7 +288,15 @@ def default_tsconfig():
         },
     }
 
-def ts_proto_library(name, proto, visibility = None, deps = [], tsconfig = None):
+def ts_proto_library(
+        name,
+        proto,
+        visibility = None,
+        deps = [],
+        tsconfig = None,
+        source_map = True,
+        declaration = True,
+        declaration_map = True):
     """A rule for compiling protobufs into a ts_project.
 
     Args:
@@ -356,9 +364,9 @@ def ts_proto_library(name, proto, visibility = None, deps = [], tsconfig = None)
         ],
         deps = deps,
         tsconfig = tsconfig,
-        source_map = True,
-        declaration = True,
-        declaration_map = True,
+        source_map = source_map,
+        declaration = declaration,
+        declaration_map = declaration_map,
     )
 
     _ts_proto_library_rule(

@@ -50,7 +50,7 @@ def rules_ts_proto_dependencies():
 
     git_repository(
         name = "com_google_protobuf_javascript",
-        commit = "e16db874a2f794d249b735c280a570ebeacbf180",
+        commit = "1167b4e01dadb0e444e3837b23a812b2535ea9a0",
         remote = "https://github.com/gonzojive/protobuf-javascript.git",
     )
 
@@ -120,6 +120,7 @@ def rules_ts_proto_dependencies():
 
     git_repository(
         name = "com_github_grpc_grpc_web",
-        commit = "f6eb07753a3d004ea0022eec541bed975e7fa0e8",
+#        commit = "f6eb07753a3d004ea0022eec541bed975e7fa0e8",
         remote = "https://github.com/gonzojive/grpc-web.git",
+        branch = "reddaly-dev",
     )
