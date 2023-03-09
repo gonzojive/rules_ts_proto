@@ -3,8 +3,8 @@
 load(
     "@rules_proto_grpc//:defs.bzl",
     "ProtoPluginInfo",
+    "proto_compile",
     "proto_compile_attrs",
-    "proto_compile_impl",
 )
 load("@aspect_rules_js//js:libs.bzl", "js_library_lib")
 
@@ -66,13 +66,13 @@ def _ts_proto_library_protoc_plugin_compile_impl(ctx):
     ))
 
     options = {
-        Label("//ts_proto/codegen:delegating_plugin"): [
+        "@com_github_gonzojive_rules_ts_proto//ts_proto/codegen:delegating_plugin": [
             "config=" + base64.encode(config_json),
         ],
     }
 
     # Execute with extracted attrs
-    usual_providers = proto_compile_impl(ctx, options_override = options)
+    usual_providers = _proto_compile_impl(ctx, options_override = options)
 
     # Go through the declared outputs to extract a GeneratedCodeInfo.
     #default_info = [x for x in usual_providers if typeof]
@@ -435,3 +435,30 @@ def _relative_path_for_import(target, start):
 
 def _label_for_printing(label):
     return "{}".format(label)
+
+def _proto_compile_impl(ctx, options_override = None):
+    """
+    Common implementation function for lang_*_compile rules.
+
+    Args:
+        ctx: The Bazel rule execution context object.
+        options_override: A dictionary with either label or string keys and list of string
+            values. If specified, replaces the ctx.attr.options value.
+    Returns:
+        Providers:
+            - ProtoCompileInfo
+            - DefaultInfo
+    """
+
+    # Load attrs that we pass as args
+    # This is done to allow writing rules that can call proto_compile with mutable attributes,
+    # such as in doc_template_compile
+    options = ctx.attr.options
+    if options_override != None:
+        options = options_override
+
+    extra_protoc_args = getattr(ctx.attr, "extra_protoc_args", [])
+    extra_protoc_files = ctx.files.extra_protoc_files
+
+    # Execute with extracted attrs
+    return proto_compile(ctx, options, extra_protoc_args, extra_protoc_files)
