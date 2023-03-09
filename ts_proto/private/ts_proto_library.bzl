@@ -3,8 +3,11 @@
 load(
     "@rules_proto_grpc//:defs.bzl",
     "ProtoPluginInfo",
-    "proto_compile",
     "proto_compile_attrs",
+)
+load(
+    "@rules_proto_grpc//internal:compile.bzl",
+    "proto_compile",
 )
 load("@aspect_rules_js//js:libs.bzl", "js_library_lib")
 
