@@ -50,7 +50,7 @@ def rules_ts_proto_dependencies():
 
     git_repository(
         name = "com_google_protobuf_javascript",
-        commit = "e16db874a2f794d249b735c280a570ebeacbf180",
+        commit = "d31e215fd4e4e2c7ced8eae1bd31e71f0eee7b9c",
         remote = "https://github.com/gonzojive/protobuf-javascript.git",
     )
 

@@ -18,3 +18,8 @@ message GreetingResponse {
 service GreetingService {
     rpc greet(GreetingRequest) returns (GreetingResponse);
 }
+
+enum TopLevelEnumExample {
+    EXAMPLE_ENUM_VALUE_1 = 0;
+    THINGY2 = 2;
+}
