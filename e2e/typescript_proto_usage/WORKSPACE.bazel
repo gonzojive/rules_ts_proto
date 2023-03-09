@@ -127,7 +127,8 @@ example_npm_repositories()
 
 git_repository(
     name = "aspect_rules_jasmine",
-    commit = "70206648d9a853551dcfa23a626e6de7d6280303",
+    #commit = "70206648d9a853551dcfa23a626e6de7d6280303",
+    commit = "fe24d621f2a3e3ca6cec51ab549b30d5b259d661",
     remote = "https://github.com/dgp1130/rules_jasmine.git",
 )
 
