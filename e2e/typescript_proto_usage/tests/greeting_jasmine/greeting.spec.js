@@ -9,6 +9,11 @@ describe("lib", () => {
   it("should say hello", () => {
     expect(say_hi()).toBe("hello");
   });
+
+  it("should be serializable", () => {
+    const request = new GreetingRequest();
+    expect(request.serializeBinary()).toBe("non empty");
+  });
 });
 
 describe("TopLevelEnumExample", () => {
