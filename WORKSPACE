@@ -108,3 +108,7 @@ install_rules_ts_proto(
 load("@rules_ts_proto_npm//:repositories.bzl", "npm_repositories")
 
 npm_repositories()
+
+load("@io_bazel_stardoc//:setup.bzl", "stardoc_repositories")
+
+stardoc_repositories()
