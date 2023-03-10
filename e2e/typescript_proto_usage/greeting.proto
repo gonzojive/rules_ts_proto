@@ -24,12 +24,18 @@ enum TopLevelEnumExample {
     THINGY2 = 2;
 }
 
+message Foo {
+    message Bar {}
+}
+
 message RepeatedThing {
     repeated string child_strings = 1;
 
     repeated .someorg.type.Position child_positions = 2;
 
     repeated GreetingRequest child_requests = 3;
+    repeated TopLevelEnumExample child_enums = 4;
+    repeated Foo.Bar child_bars = 5;
 }
 
 message MutuallyExclusiveThing {
