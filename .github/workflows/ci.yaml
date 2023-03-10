@@ -28,8 +28,10 @@ jobs:
       - uses: actions/checkout@v3
       - id: bazel_from_bazelversion
         run: echo "bazelversion=$(head -n 1 .bazelversion)" >> $GITHUB_OUTPUT
-      - id: bazel_5
-        run: echo "bazelversion=5.3.2" >> $GITHUB_OUTPUT
+      # bazel 5 testing disabled for now due to
+      # https://github.com/aspect-build/bazel-lib/issues/392
+      # - id: bazel_5
+      #   run: echo "bazelversion=5.3.2" >> $GITHUB_OUTPUT
     outputs:
       # Will look like ["<version from .bazelversion>", "5.3.2"]
       bazelversions: ${{ toJSON(steps.*.outputs.bazelversion) }}
