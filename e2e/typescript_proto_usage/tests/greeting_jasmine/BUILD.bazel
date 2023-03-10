@@ -8,5 +8,6 @@ jasmine_test(
         "greeting.spec.js",
         "package.json",
         "//:greeting_ts_proto",
+        "//location:location_ts_proto",
     ],
 )

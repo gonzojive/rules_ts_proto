@@ -25,5 +25,14 @@ enum TopLevelEnumExample {
 }
 
 message RepeatedThing {
-    repeated string child_things = 1;
+    repeated string child_strings = 1;
+
+    repeated .someorg.type.Position child_positions = 2;
+}
+
+message MutuallyExclusiveThing {
+    oneof some_value {
+        string mutex_string = 1;
+        .someorg.type.Position mutex_position = 2;
+    }
 }
