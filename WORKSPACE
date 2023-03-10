@@ -80,11 +80,21 @@ nodejs_register_toolchains(
 
 # Register aspect_bazel_lib toolchains;
 # If you use npm_translate_lock or npm_import from aspect_rules_js you can omit this block.
-load("@aspect_bazel_lib//lib:repositories.bzl", "register_copy_directory_toolchains", "register_copy_to_directory_toolchains")
+load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "register_copy_directory_toolchains", "register_copy_to_directory_toolchains", "register_jq_toolchains", "register_yq_toolchains")
 
 register_copy_directory_toolchains()
 
 register_copy_to_directory_toolchains()
+
+aspect_bazel_lib_dependencies()
+
+# Register the following toolchain to use jq
+
+register_jq_toolchains()
+
+# Register the following toolchain to use yq
+
+register_yq_toolchains()
 
 load("//ts_proto:workspace_deps.bzl", "install_rules_ts_proto")
 
