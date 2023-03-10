@@ -37,15 +37,10 @@ def rules_ts_proto_dependencies():
         ],
     )
 
-    # git_repository(
-    #     name = "rules_proto_grpc",
-    #     commit = "1c9e81538467d3809dbf4035007397138a015583",
-    #     remote = "https://github.com/gonzojive/rules_proto_grpc.git",
-    # )
-
-    local_repository(
+    git_repository(
         name = "rules_proto_grpc",
-        path = "/home/red/code/rules_proto_grpc",
+        commit = "1c9e81538467d3809dbf4035007397138a015583",
+        remote = "https://github.com/gonzojive/rules_proto_grpc.git",
     )
 
     git_repository(
@@ -53,11 +48,6 @@ def rules_ts_proto_dependencies():
         commit = "36960c27a88db57c2f671eddd277384da406afa1",
         remote = "https://github.com/gonzojive/protobuf-javascript.git",
     )
-
-    # local_repository(
-    #     name = "com_google_protobuf_javascript",
-    #     path = "/home/red/code/protobuf-javascript",
-    # )
 
     http_archive(
         name = "rules_proto",

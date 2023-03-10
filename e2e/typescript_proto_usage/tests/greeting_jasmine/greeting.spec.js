@@ -1,4 +1,4 @@
-import { GreetingRequest, TopLevelEnumExample } from "../../greeting_pb.mjs"
+import { GreetingRequest, TopLevelEnumExample, RepeatedThing } from "../../greeting_pb.mjs"
 //import { GreetingRequest } from "../../greeting_pb";
 
 function say_hi() {
@@ -14,6 +14,11 @@ describe("lib", () => {
     const request = new GreetingRequest().setName("hello");
     const requestRoundtripped = GreetingRequest.deserializeBinary(request.serializeBinary());
     expect(requestRoundtripped.getName()).toBe("hello");
+  });
+
+  it("should have valid repeated fields", () => {
+    const thing = new RepeatedThing().setChildThingsList(["x", "y"]);
+    expect(thing.getChildThingsList()).toBe(["x", "y"]);
   });
 });
 
