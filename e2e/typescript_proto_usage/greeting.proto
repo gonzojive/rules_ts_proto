@@ -28,6 +28,8 @@ message RepeatedThing {
     repeated string child_strings = 1;
 
     repeated .someorg.type.Position child_positions = 2;
+
+    repeated GreetingRequest child_requests = 3;
 }
 
 message MutuallyExclusiveThing {
