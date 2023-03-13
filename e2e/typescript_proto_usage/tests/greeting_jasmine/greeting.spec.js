@@ -60,7 +60,7 @@ describe("lib", () => {
     expect(thing.getSomeValueCase()).toEqual(1);
   });
 
-  it("should return correct onof case for nested message", () => {
+  it("should return correct oneof case for nested message", () => {
     const thing = new MutuallyExclusiveThing()
         .setTheThing(new MutuallyExclusiveThing.NestedThing().setMutexString("test"));
     expect(thing.getTheThing().getSomeValueCase()).toEqual(1);
