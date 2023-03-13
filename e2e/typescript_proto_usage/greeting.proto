@@ -49,6 +49,15 @@ message MutuallyExclusiveThing {
     string mutex_string = 1;
     .someorg.type.Position mutex_position = 2;
   }
+
+  message NestedThing {
+    oneof some_value {
+      string mutex_string = 1;
+      .someorg.type.Position mutex_position = 2;
+    }
+  }
+
+  NestedThing the_thing = 3;
 }
 
 message Ancestor1 {
