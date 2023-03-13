@@ -9,6 +9,11 @@ option java_multiple_files = true;
 message GreetingRequest {
     string name = 1;
     .someorg.type.Position origin = 2;
+
+    message Greeting {
+        string message = 1;
+    }
+    Greeting greeting_message = 3;
 }
 
 message GreetingResponse {
