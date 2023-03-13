@@ -1,51 +1,63 @@
 syntax = "proto3";
 
-package com.example.greeting.v1;
+package com.example.greeting.v3;
 
 import "github.com/gonzojive/rules_ts_proto/example/prefix/location/location.proto";
 
 option java_multiple_files = true;
 
 message GreetingRequest {
-    string name = 1;
-    .someorg.type.Position origin = 2;
+  string name = 1;
+  .someorg.type.Position origin = 2;
 
-    message Greeting {
-        string message = 1;
-    }
-    Greeting greeting_message = 3;
+  message Greeting {
+    int32 unimportant_field = 1;
+    string message = 5;
+  }
+  Greeting greeting_message = 3;
 }
 
 message GreetingResponse {
-    string greeting = 1;
+  string greeting = 1;
 }
 
 service GreetingService {
-    rpc greet(GreetingRequest) returns (GreetingResponse);
+  rpc greet(GreetingRequest) returns (GreetingResponse);
 }
 
 enum TopLevelEnumExample {
-    EXAMPLE_ENUM_VALUE_1 = 0;
-    THINGY2 = 2;
+  EXAMPLE_ENUM_VALUE_1 = 0;
+  THINGY2 = 2;
 }
 
 message Foo {
-    message Bar {}
+  message Bar {}
 }
 
 message RepeatedThing {
-    repeated string child_strings = 1;
+  repeated string child_strings = 1;
 
-    repeated .someorg.type.Position child_positions = 2;
+  repeated .someorg.type.Position child_positions = 2;
 
-    repeated GreetingRequest child_requests = 3;
-    repeated TopLevelEnumExample child_enums = 4;
-    repeated Foo.Bar child_bars = 5;
+  repeated GreetingRequest child_requests = 3;
+  repeated TopLevelEnumExample child_enums = 4;
+  repeated Foo.Bar child_bars = 5;
 }
 
 message MutuallyExclusiveThing {
-    oneof some_value {
-        string mutex_string = 1;
-        .someorg.type.Position mutex_position = 2;
+  oneof some_value {
+    string mutex_string = 1;
+    .someorg.type.Position mutex_position = 2;
+  }
+}
+
+message Ancestor1 {
+  message Ancestor2 {
+    message Ancestor3 {
+      int32 ignored1 = 1;
+      int32 ignored2 = 2;
+      int32 ignored3 = 3;
+      string value = 4;
     }
+  }
 }

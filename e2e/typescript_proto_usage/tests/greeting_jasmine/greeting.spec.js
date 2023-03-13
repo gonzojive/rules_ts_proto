@@ -1,4 +1,4 @@
-import { GreetingRequest, TopLevelEnumExample, RepeatedThing } from "../../greeting_pb.mjs"
+import { Ancestor1, GreetingRequest, TopLevelEnumExample, RepeatedThing } from "../../greeting_pb.mjs"
 import { Position } from "../../location/location_pb.mjs"
 //import { GreetingRequest } from "../../greeting_pb";
 
@@ -26,6 +26,15 @@ describe("lib", () => {
     const requestRoundtripped = GreetingRequest.deserializeBinary(request.serializeBinary());
     expect(requestRoundtripped.getOrigin().getLatitude()).toBe(latitude);
     expect(requestRoundtripped.getGreetingMessage().getMessage()).toBe(message);
+  });
+
+  it("sub-sub types should be serializable", () => {
+    const input = new Ancestor1.Ancestor2.Ancestor3()
+        .setValue("xyz");
+    const inputRoundtripped = Ancestor1.Ancestor2.Ancestor3.deserializeBinary(
+      input.serializeBinary());
+    expect(input.getValue()).toBe("xyz");
+    expect(inputRoundtripped.getValue()).toBe("xyz");
   });
 
   it("should be serializable with repeated fields", () => {
