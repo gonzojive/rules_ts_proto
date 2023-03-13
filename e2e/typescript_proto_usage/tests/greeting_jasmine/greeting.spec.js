@@ -19,9 +19,13 @@ describe("lib", () => {
 
   it("sub types should be serializable", () => {
     const latitude = 42;
-    const request = new GreetingRequest().setOrigin(new Position().setLatitude(latitude));
+    const message = 'hello';
+    const request = new GreetingRequest()
+        .setOrigin(new Position().setLatitude(latitude))
+        .setGreetingMessage(new GreetingRequest.Greeting().setMessage(message));
     const requestRoundtripped = GreetingRequest.deserializeBinary(request.serializeBinary());
-    expect(requestRoundtripped.getPosition().getLatitude()).toBe(latitude);
+    expect(requestRoundtripped.getOrigin().getLatitude()).toBe(latitude);
+    expect(requestRoundtripped.getGreetingMessage().getMessage()).toBe(message);
   });
 
   it("should be serializable with repeated fields", () => {
