@@ -17,6 +17,13 @@ describe("lib", () => {
     expect(requestRoundtripped.getName()).toBe("hello");
   });
 
+  it("sub types should be serializable", () => {
+    const latitude = 42;
+    const request = new GreetingRequest().setOrigin(new Position().setLatitude(latitude));
+    const requestRoundtripped = GreetingRequest.deserializeBinary(request.serializeBinary());
+    expect(requestRoundtripped.getPosition().getLatitude()).toBe(latitude);
+  });
+
   it("should be serializable with repeated fields", () => {
     const object = new RepeatedThing().setChildStringsList(["x", "y"]);
     const roundtripped = RepeatedThing.deserializeBinary(object.serializeBinary());
