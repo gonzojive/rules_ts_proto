@@ -65,6 +65,22 @@ describe("lib", () => {
         .setTheThing(new MutuallyExclusiveThing.NestedThing().setMutexString("test"));
     expect(thing.getTheThing().getSomeValueCase()).toEqual(1);
   });
+
+  it("should clear field", () => {
+    const message = new GreetingRequest().setOrigin(new Position());
+    expect(message.getOrigin()).not.toBeUndefined();
+
+    message.clearOrigin();
+    expect(message.getOrigin()).toBeUndefined();
+  });
+
+  it("should be able to check if value set", () => {
+    const message = new GreetingRequest();
+    expect(message.hasOrigin()).toBe(false);
+
+    message.setOrigin(new Position());
+    expect(message.hasOrigin()).toBe(true);
+  })
 });
 
 describe("TopLevelEnumExample", () => {
