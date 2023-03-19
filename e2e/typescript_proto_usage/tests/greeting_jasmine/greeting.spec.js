@@ -1,4 +1,4 @@
-import { Ancestor1, GreetingRequest, TopLevelEnumExample, RepeatedThing } from "../../greeting_pb.mjs"
+import { Ancestor1, GreetingRequest, TopLevelEnumExample, RepeatedThing, MutuallyExclusiveThing } from "../../greeting_pb.mjs"
 import { Position } from "../../location/location_pb.mjs"
 //import { GreetingRequest } from "../../greeting_pb";
 
@@ -54,6 +54,33 @@ describe("lib", () => {
     const thing = new RepeatedThing().setChildPositionsList([a, b]);
     expect(thing.getChildPositionsList().map(x => x.getLatitude())).toEqual([42, 43]);
   });
+
+  it("should return correct oneof case", () => {
+    const thing = new MutuallyExclusiveThing().setMutexString("test");
+    expect(thing.getSomeValueCase()).toEqual(1);
+  });
+
+  it("should return correct oneof case for nested message", () => {
+    const thing = new MutuallyExclusiveThing()
+        .setTheThing(new MutuallyExclusiveThing.NestedThing().setMutexString("test"));
+    expect(thing.getTheThing().getSomeValueCase()).toEqual(1);
+  });
+
+  it("should clear field", () => {
+    const message = new GreetingRequest().setOrigin(new Position());
+    expect(message.getOrigin()).not.toBeUndefined();
+
+    message.clearOrigin();
+    expect(message.getOrigin()).toBeUndefined();
+  });
+
+  it("should be able to check if value set", () => {
+    const message = new GreetingRequest();
+    expect(message.hasOrigin()).toBe(false);
+
+    message.setOrigin(new Position());
+    expect(message.hasOrigin()).toBe(true);
+  })
 });
 
 describe("TopLevelEnumExample", () => {
