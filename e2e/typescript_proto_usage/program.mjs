@@ -1,4 +1,3 @@
-//import { GreetingRequest } from "./greeting_pb.mjs";
 import { Position } from "./location/location_pb.mjs";
 
 const pos = new Position();
