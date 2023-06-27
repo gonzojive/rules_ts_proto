@@ -113,3 +113,17 @@ def rules_ts_proto_dependencies():
         commit = "f6eb07753a3d004ea0022eec541bed975e7fa0e8",
         remote = "https://github.com/gonzojive/grpc-web.git",
     )
+
+    git_repository(
+        name = "com_google_api",
+        commit = "f454c15b49a13f8834002814a62fd22d67c521c4",
+        remote = "https://github.com/googleapis/googleapis.git",
+        shallow_since = "1658776854 +0000",
+    )
+
+    git_repository(
+        name = "io_grpc_grpc_java",
+        commit = "3500243f4320fcde1d567184b822c98de017498e",
+        remote = "https://github.com/grpc/grpc-java.git",
+        shallow_since = "1650910743 -0700",
+    )

@@ -187,3 +187,16 @@ esbuild_register_toolchains(
     name = "esbuild",
     esbuild_version = ESBUILD_VERSION,
 )
+
+##############################################################################
+# Google API Common Language Imports
+##############################################################################
+
+load("@com_google_api//:repository_rules.bzl", "switched_rules_by_language")
+
+switched_rules_by_language(
+    name = "com_google_googleapis_imports",
+    go = True,
+    grpc = True,
+    java = True,
+)

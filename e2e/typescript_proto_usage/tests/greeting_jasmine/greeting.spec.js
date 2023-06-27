@@ -1,6 +1,6 @@
+import { Service } from "../../service_pb.mjs"
 import { Ancestor1, GreetingRequest, TopLevelEnumExample, RepeatedThing, MutuallyExclusiveThing } from "../../greeting_pb.mjs"
 import { Position } from "../../location/location_pb.mjs"
-//import { GreetingRequest } from "../../greeting_pb";
 
 function say_hi() {
   return new GreetingRequest().setName("hello").getName();
@@ -88,3 +88,9 @@ describe("TopLevelEnumExample", () => {
     expect(TopLevelEnumExample.THINGY2).toBe(2);
   });
 });
+
+describe("Service", () => {
+    it("should have necessary protos defined", () => {
+      expect(new Service()).not.toBeUndefined();
+    });
+  });

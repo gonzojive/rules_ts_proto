@@ -7,6 +7,7 @@ jasmine_test(
     data = [
         "greeting.spec.js",
         "package.json",
+        "//:googleapis_service_ts_proto",
         "//:greeting_ts_proto",
         "//location:location_ts_proto",
     ],
