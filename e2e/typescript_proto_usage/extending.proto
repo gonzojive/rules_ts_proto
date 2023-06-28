@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package com.example.extending;
+
+import "github.com/gonzojive/rules_ts_proto/example/prefix/google-protobuf-debug/descriptor.proto";
+
+extend google.protobuf.MethodOptions {
+  double foo = 999999;
+}
+
+message ExampleMessage {
+  double foo = 1;
+}

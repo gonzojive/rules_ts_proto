@@ -5,9 +5,8 @@ jasmine_test(
     args = ["*.spec.js"],
     chdir = package_name(),
     data = [
-        "greeting.spec.js",
+        "extending.spec.js",
         "package.json",
-        "//:greeting_ts_proto",
-        "//location:location_ts_proto",
+        "//:extending_ts_proto",
     ],
 )

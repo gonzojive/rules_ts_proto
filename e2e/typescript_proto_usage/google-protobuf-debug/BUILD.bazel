@@ -1,12 +1,15 @@
-# load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@com_github_gonzojive_rules_ts_proto//ts_proto:defs.bzl", "ts_proto_library")
 
-# npm_package(
-#     name = "google-protobuf",
-#     srcs = [
-#         "google-protobuf.js",
-#         "google-protobuf.js.map",
-#         "package.json",
-#     ],
-#     package = "google-protobuf",
-#     visibility = ["//visibility:public"],
-# )
+proto_library(
+    name = "descriptor_proto",
+    srcs = ["descriptor.proto"],
+    import_prefix = "github.com/gonzojive/rules_ts_proto/example/prefix",
+    visibility = ["//visibility:public"],
+)
+
+ts_proto_library(
+    name = "descriptor_ts_proto",
+    proto = ":descriptor_proto",
+    visibility = ["//visibility:public"],
+)

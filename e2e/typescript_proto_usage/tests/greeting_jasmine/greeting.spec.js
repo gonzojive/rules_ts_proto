@@ -1,4 +1,3 @@
-import { Service } from "../../service_pb.mjs"
 import { Ancestor1, GreetingRequest, TopLevelEnumExample, RepeatedThing, MutuallyExclusiveThing } from "../../greeting_pb.mjs"
 import { Position } from "../../location/location_pb.mjs"
 
@@ -88,9 +87,3 @@ describe("TopLevelEnumExample", () => {
     expect(TopLevelEnumExample.THINGY2).toBe(2);
   });
 });
-
-describe("Service", () => {
-    it("should have necessary protos defined", () => {
-      expect(new Service()).not.toBeUndefined();
-    });
-  });

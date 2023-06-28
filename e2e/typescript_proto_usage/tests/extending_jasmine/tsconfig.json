@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "*": ["./", "../../bazel-bin/tests/extending_jasmine"]
+    }
+  }
+}
