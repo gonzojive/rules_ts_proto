@@ -45,8 +45,9 @@ def rules_ts_proto_dependencies():
 
     git_repository(
         name = "com_google_protobuf_javascript",
-        commit = "885b9cdad5acc46d67f3850155d34226e2b4ee8b",
-        remote = "https://github.com/gonzojive/protobuf-javascript.git",
+        #commit = "885b9cdad5acc46d67f3850155d34226e2b4ee8b",
+        remote = "https://github.com/davemasselink/protobuf-javascript.git",
+        branch = "es6"
     )
 
     http_archive(
