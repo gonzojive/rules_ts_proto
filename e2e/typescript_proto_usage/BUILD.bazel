@@ -92,7 +92,7 @@ proto_library(
     srcs = ["extending.proto"],
     import_prefix = "github.com/gonzojive/rules_ts_proto/example/prefix",
     deps = [
-        "//google-protobuf-debug:descriptor_proto",
+        "@com_google_protobuf//:descriptor_proto",
     ],
 )
 
@@ -101,6 +101,11 @@ ts_proto_library(
     proto = ":extending_proto",
     visibility = ["//visibility:public"],
     deps = [
-        "//google-protobuf-debug:descriptor_ts_proto",
+        ":descriptor_ts_proto",
     ],
+)
+
+ts_proto_library(
+    name = "descriptor_ts_proto",
+    proto = "@com_google_protobuf//:descriptor_proto",
 )
