@@ -6,8 +6,6 @@ load("@bazel_gazelle//:def.bzl", "gazelle")
 load("@com_github_gonzojive_rules_ts_proto//ts_proto:defs.bzl", "ts_proto_library")
 load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
 load("@example_npm//:defs.bzl", example_npm_link_all_packages = "npm_link_all_packages")
-
-#load("@rules_ts_proto_npm//:defs.bzl", ts_proto_link_all_packages = "npm_link_all_packages")
 load("@aspect_rules_js//js:defs.bzl", "js_binary")
 
 # Replace with a usage of your rule/macro
@@ -80,19 +78,13 @@ js_binary(
 
 example_npm_link_all_packages(name = "node_modules")
 
-#ts_proto_link_all_packages(name = "node_modules")
-
-# npm_link_package(
-#     name = "node_modules/google-protobuf",
-#     src = "//google-protobuf-debug:google-protobuf",
-# )
-
 proto_library(
     name = "extending_proto",
     srcs = ["extending.proto"],
     import_prefix = "github.com/gonzojive/rules_ts_proto/example/prefix",
     deps = [
         "@com_google_protobuf//:descriptor_proto",
+        "@com_google_api//google/longrunning:operations_proto",
     ],
 )
 
@@ -102,10 +94,70 @@ ts_proto_library(
     visibility = ["//visibility:public"],
     deps = [
         ":descriptor_ts_proto",
+        ":operations_ts_proto",
+    ],
+)
+
+ts_proto_library(
+    name = "operations_ts_proto",
+    proto = "@com_google_api//google/longrunning:operations_proto",
+    deps = [
+        ":annotations_ts_proto",
+        ":any_ts_proto",
+        ":client_ts_proto",
+        ":descriptor_ts_proto",
+        ":duration_ts_proto",
+        ":empty_ts_proto",
+        ":status_ts_proto",
+    ],
+)
+
+ts_proto_library(
+    name = "annotations_ts_proto",
+    proto = "@com_google_api//google/api:annotations_proto",
+    deps = [
+        ":descriptor_ts_proto",
+        ":http_ts_proto",
+    ],
+)
+
+ts_proto_library(
+    name = "any_ts_proto",
+    proto = "@com_google_protobuf//:any_proto",
+)
+
+ts_proto_library(
+    name = "client_ts_proto",
+    proto = "@com_google_api//google/api:client_proto",
+    deps = [
+        ":descriptor_ts_proto",
     ],
 )
 
 ts_proto_library(
     name = "descriptor_ts_proto",
     proto = "@com_google_protobuf//:descriptor_proto",
+)
+
+ts_proto_library(
+    name = "duration_ts_proto",
+    proto = "@com_google_protobuf//:duration_proto",
+)
+
+ts_proto_library(
+    name = "empty_ts_proto",
+    proto = "@com_google_protobuf//:empty_proto",
+)
+
+ts_proto_library(
+    name = "http_ts_proto",
+    proto = "@com_google_api//google/api:http_proto",
+)
+
+ts_proto_library(
+    name = "status_ts_proto",
+    proto = "@com_google_api//google/rpc:status_proto",
+    deps = [
+        ":any_ts_proto",
+    ],
 )

@@ -3,11 +3,12 @@ syntax = "proto3";
 package com.example.extending;
 
 import "google/protobuf/descriptor.proto";
+import "google/longrunning/operations.proto";
 
 extend google.protobuf.MethodOptions {
   double foo = 999999;
 }
 
 message ExampleMessage {
-  double foo = 1;
+  google.longrunning.Operation foo = 1;
 }
