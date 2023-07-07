@@ -1,0 +1,12 @@
+load("@aspect_rules_jasmine//jasmine:defs.bzl", "jasmine_test")
+
+jasmine_test(
+    name = "test",
+    args = ["*.spec.js"],
+    chdir = package_name(),
+    data = [
+        "extending.spec.js",
+        "package.json",
+        "//:extending_ts_proto",
+    ],
+)
