@@ -143,7 +143,6 @@ _ts_proto_library_protoc_plugin_compile = rule(
     attrs = dict(
         proto_compile_attrs,
         deps = attr.label_list(
-            # see
             providers = [
                 # ts_proto_library deps should be be used to provide the mapping
                 # from proto file -> generated js file.
@@ -161,16 +160,6 @@ _ts_proto_library_protoc_plugin_compile = rule(
             providers = [ProtoPluginInfo],
             default = [
                 Label("//ts_proto/codegen:delegating_plugin"),
-                # TODO(reddaly): Modify to use
-                # https://github.com/protocolbuffers/protobuf-javascript
-                # npm package: https://www.npmjs.com/package/google-protobuf
-                #Label("//ts_proto/codegen:google_js_plugin"),
-
-                # Generate type definitions for the generated .js code.
-                #Label("//ts_proto/codegen:ts_protoc_gen_plugin"),
-
-                # Generates gRPC-web code.
-                #Label("//ts_proto/codegen:com_github_grpc_grpc_web"),
             ],
             doc = "List of protoc plugins to apply",
         ),
@@ -374,19 +363,8 @@ def ts_proto_library(name, proto, visibility = None, deps = [], tsconfig = None)
         visibility = visibility,
     )
 
-    # # TypeScript import resolution description:
-    # # https://www.typescriptlang.org/docs/handbook/module-resolution.html
-    # npm_package(
-    #     name = name + "_npm",
-    #     srcs = [
-    #         name,
-    #     ],
-    #     root_paths = [
-    #         #name + "_uber",
-    #         ".",
-    #     ],
-    #     visibility = visibility,
-    # )
+    # TypeScript import resolution description:
+    # https://www.typescriptlang.org/docs/handbook/module-resolution.html
 
 def _import_paths_of_direct_sources(proto_info):
     """Extracts the path used to import srcs of ProtoInfo.
