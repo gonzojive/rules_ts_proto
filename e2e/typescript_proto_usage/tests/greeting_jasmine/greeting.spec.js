@@ -1,4 +1,5 @@
 import { Ancestor1, GreetingRequest, TopLevelEnumExample, RepeatedThing, MutuallyExclusiveThing } from "../../greeting_pb.mjs"
+import { GreetingServiceClient } from "../../greeting_grpc_web_pb.mjs"
 import { Position } from "../../location/location_pb.mjs"
 
 function say_hi() {
@@ -85,5 +86,11 @@ describe("lib", () => {
 describe("TopLevelEnumExample", () => {
   it("THINGY2 member should have value 2", () => {
     expect(TopLevelEnumExample.THINGY2).toBe(2);
+  });
+});
+
+describe("GreetingServiceClient", () => {
+  it("GreetingServiceClient isn't null", () => {
+    expect(GreetingServiceClient).not.toBeNull();
   });
 });

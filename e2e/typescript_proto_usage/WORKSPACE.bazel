@@ -97,6 +97,7 @@ load("@com_github_gonzojive_rules_ts_proto//ts_proto:workspace_deps.bzl", "insta
 
 install_rules_ts_proto(
     dep_targets = {
+        "grpc-web": "//:node_modules/grpc-web",
         "google-protobuf": "//:node_modules/google-protobuf",
         "@types/google-protobuf": "//:node_modules/@types/google-protobuf",
     },

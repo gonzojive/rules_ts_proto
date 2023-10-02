@@ -103,6 +103,8 @@ def _this_rule_import_map_entry(ctx):
     proto_info = ctx.attr.protos[0][ProtoInfo]
     proto_filename = _import_paths_of_direct_sources(proto_info)[0]
     js_import = "./" + paths.basename(proto_filename).removesuffix(".proto") + "_pb"
+    if _INCLUDE_SUFFIX_IN_IMPORT:
+        js_import += ".mjs"
     return struct(
         proto_import = proto_filename,
         js_import = js_import,
@@ -329,20 +331,17 @@ def ts_proto_library(name, proto, visibility = None, deps = [], tsconfig = None)
     )
 
     implicit_deps = []
-    for dep_package_name in ["google-protobuf", "@types/google-protobuf"]:
+    for dep_package_name in [
+        "grpc-web",
+        "google-protobuf",
+        "@types/google-protobuf",
+    ]:
         implicit_deps += JS_IMPORT_BAZEL_TARGET_MAP[dep_package_name]
 
     deps = [x for x in deps]
     for want_dep in implicit_deps:
         if want_dep not in deps:
             deps.append(want_dep)
-
-    # js_library(
-    #     name = name + "_partial_js_lib",
-    #     srcs = [non_ts_files],
-    #     deps = deps,
-    #     visibility = visibility,
-    # )
 
     ts_project(
         name = name + "_ts_project",

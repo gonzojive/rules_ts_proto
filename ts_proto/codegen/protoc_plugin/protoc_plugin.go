@@ -121,16 +121,14 @@ func (up *uberPlugin) generateCode(ctx context.Context, req *pluginpb.CodeGenera
 		return resp, nil
 	}
 	importsReplacer := protoImportsReplacer(cfg)
-	// defsResp, err := runPluginWithParameter(up.genTSDefsPluginPath, "", importsReplacer)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error running Google's protobuf-javascript codegen plugin: %w", err)
-	// }
 
 	jsResp, err := runPluginWithParameter(up.genJSPluginPath, "import_style=es6,binary", importsReplacer, ensureMJSExtension)
 	if err != nil {
 		return nil, fmt.Errorf("error running ts definition codegen plugin: %w", err)
 	}
 
+	// The options for the grpc-web plugin are documented here:
+	// https://github.com/grpc/grpc-web#import-style
 	grpcResp, err := runPluginWithParameter(up.genGRPCPluginPath, "import_style=commonjs+dts,mode=grpcweb", processGRPCResponse, importsReplacer)
 	if err != nil {
 		return nil, fmt.Errorf("error running grpc definition codegen plugin: %w", err)
@@ -198,10 +196,11 @@ func processGRPCResponse(req *pluginpb.CodeGeneratorRequest, resp *pluginpb.Code
 		filenames[f.GetName()] = true
 	}
 	for _, fileToGenerate := range req.GetFileToGenerate() {
-		serviceJS := fmt.Sprintf("%s_grpc_web_pb.js", strings.TrimSuffix(fileToGenerate, ".proto"))
-		serviceTypings := fmt.Sprintf("%s_grpc_web_pb.d.ts", strings.TrimSuffix(fileToGenerate, ".proto"))
-		messageTypingsDTS := fmt.Sprintf("%s_pb.d.ts", strings.TrimSuffix(fileToGenerate, ".proto"))
-		messageTypingsDMTS := fmt.Sprintf("%s_pb.d.mts", strings.TrimSuffix(fileToGenerate, ".proto"))
+		prefix := strings.TrimSuffix(fileToGenerate, ".proto")
+		serviceJS := fmt.Sprintf("%s_grpc_web_pb.js", prefix)
+		serviceTypings := fmt.Sprintf("%s_grpc_web_pb.d.ts", prefix)
+		messageTypingsDTS := fmt.Sprintf("%s_pb.d.ts", prefix)
+		messageTypingsDMTS := fmt.Sprintf("%s_pb.d.mts", prefix)
 
 		if msg := findResponseFileByName(resp, messageTypingsDTS); msg != nil {
 			msg.Name = proto.String(messageTypingsDMTS)
