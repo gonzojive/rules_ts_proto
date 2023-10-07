@@ -91,9 +91,8 @@ def rules_ts_proto_dependencies():
 
     git_repository(
         name = "com_github_grpc_grpc_web",
-        #commit = "9cb8524caa0fa2ce91ab5788c12abb42a1803fa5",
-        commit = "4a9429262b1ba749d9d974627cc4878d2f662415",
-        remote = "https://github.com/gonzojive/grpc-web.git",
+        commit = "49d3b7086895de22b44ec7be29b4c259b553bff8",
+        remote = "https://github.com/grpc/grpc-web.git",
     )
 
     git_repository(
