@@ -100,6 +100,7 @@ load("//ts_proto:workspace_deps.bzl", "install_rules_ts_proto")
 
 install_rules_ts_proto(
     dep_targets = {
+        "grpc-web": "//:node_modules/grpc-web",
         "google-protobuf": "//:node_modules/google-protobuf",
         "@types/google-protobuf": "//:node_modules/@types/google-protobuf",
     },

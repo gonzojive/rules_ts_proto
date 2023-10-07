@@ -81,19 +81,6 @@ def rules_ts_proto_dependencies():
         url = "https://github.com/aspect-build/rules_js/archive/refs/tags/v1.16.0.tar.gz",
     )
 
-    # git_repository(
-    #     name = "aspect_rules_js",
-    #     commit = "fc9bd0cfc52d0cfbaf69538e6425094bb077afe9",
-    #     remote = "https://github.com/gonzojive/rules_js.git",
-    # )
-
-    # Sometimes pushed to the reddaly-dev branch of
-    # https://github.com/gonzojive/grpc-web.git
-    # local_repository(
-    #     name = "com_github_grpc_grpc_web",
-    #     path = "/home/red/code/grpc-web",
-    # )
-
     # https://github.com/aspect-build/rules_ts/releases/tag/v1.2.0
     http_archive(
         name = "aspect_rules_ts",
@@ -102,16 +89,10 @@ def rules_ts_proto_dependencies():
         url = "https://github.com/aspect-build/rules_ts/archive/refs/tags/v1.2.0.tar.gz",
     )
 
-    # git_repository(
-    #     name = "com_github_grpc_grpc_web",
-    #     commit = "e49389873d887d15ab2870288f620aa2f15b3b85",
-    #     remote = "https://github.com/grpc/grpc-web.git",
-    # )
-
     git_repository(
         name = "com_github_grpc_grpc_web",
-        commit = "f6eb07753a3d004ea0022eec541bed975e7fa0e8",
-        remote = "https://github.com/gonzojive/grpc-web.git",
+        commit = "49d3b7086895de22b44ec7be29b4c259b553bff8",
+        remote = "https://github.com/grpc/grpc-web.git",
     )
 
     git_repository(

@@ -3,13 +3,11 @@ load(":utils_unit_test.bzl", "myhelpers_test_suite")
 
 bzl_library(
     name = "ts_proto_library",
-    srcs = [
-        "filtered_files.bzl",
-        "ts_proto_library.bzl",
-        "utils.bzl",
-    ],
+    srcs = ["ts_proto_library.bzl"],
     visibility = ["//ts_proto:__subpackages__"],
     deps = [
+        ":filtered_files",
+        ":utils",
         "@aspect_bazel_lib//lib:base64",
         "@aspect_rules_js//js:defs",
         "@aspect_rules_js//js:libs",
@@ -21,3 +19,15 @@ bzl_library(
 )
 
 myhelpers_test_suite(name = "myhelpers_tests")
+
+bzl_library(
+    name = "filtered_files",
+    srcs = ["filtered_files.bzl"],
+    visibility = ["//ts_proto:__subpackages__"],
+)
+
+bzl_library(
+    name = "utils",
+    srcs = ["utils.bzl"],
+    visibility = ["//ts_proto:__subpackages__"],
+)

@@ -103,6 +103,8 @@ def _this_rule_import_map_entry(ctx):
     proto_info = ctx.attr.protos[0][ProtoInfo]
     proto_filename = _import_paths_of_direct_sources(proto_info)[0]
     js_import = "./" + paths.basename(proto_filename).removesuffix(".proto") + "_pb"
+    if _INCLUDE_SUFFIX_IN_IMPORT:
+        js_import += ".mjs"
     return struct(
         proto_import = proto_filename,
         js_import = js_import,
@@ -143,7 +145,6 @@ _ts_proto_library_protoc_plugin_compile = rule(
     attrs = dict(
         proto_compile_attrs,
         deps = attr.label_list(
-            # see
             providers = [
                 # ts_proto_library deps should be be used to provide the mapping
                 # from proto file -> generated js file.
@@ -161,16 +162,6 @@ _ts_proto_library_protoc_plugin_compile = rule(
             providers = [ProtoPluginInfo],
             default = [
                 Label("//ts_proto/codegen:delegating_plugin"),
-                # TODO(reddaly): Modify to use
-                # https://github.com/protocolbuffers/protobuf-javascript
-                # npm package: https://www.npmjs.com/package/google-protobuf
-                #Label("//ts_proto/codegen:google_js_plugin"),
-
-                # Generate type definitions for the generated .js code.
-                #Label("//ts_proto/codegen:ts_protoc_gen_plugin"),
-
-                # Generates gRPC-web code.
-                #Label("//ts_proto/codegen:com_github_grpc_grpc_web"),
             ],
             doc = "List of protoc plugins to apply",
         ),
@@ -340,20 +331,17 @@ def ts_proto_library(name, proto, visibility = None, deps = [], tsconfig = None)
     )
 
     implicit_deps = []
-    for dep_package_name in ["google-protobuf", "@types/google-protobuf"]:
+    for dep_package_name in [
+        "grpc-web",
+        "google-protobuf",
+        "@types/google-protobuf",
+    ]:
         implicit_deps += JS_IMPORT_BAZEL_TARGET_MAP[dep_package_name]
 
     deps = [x for x in deps]
     for want_dep in implicit_deps:
         if want_dep not in deps:
             deps.append(want_dep)
-
-    # js_library(
-    #     name = name + "_partial_js_lib",
-    #     srcs = [non_ts_files],
-    #     deps = deps,
-    #     visibility = visibility,
-    # )
 
     ts_project(
         name = name + "_ts_project",
@@ -374,19 +362,8 @@ def ts_proto_library(name, proto, visibility = None, deps = [], tsconfig = None)
         visibility = visibility,
     )
 
-    # # TypeScript import resolution description:
-    # # https://www.typescriptlang.org/docs/handbook/module-resolution.html
-    # npm_package(
-    #     name = name + "_npm",
-    #     srcs = [
-    #         name,
-    #     ],
-    #     root_paths = [
-    #         #name + "_uber",
-    #         ".",
-    #     ],
-    #     visibility = visibility,
-    # )
+    # TypeScript import resolution description:
+    # https://www.typescriptlang.org/docs/handbook/module-resolution.html
 
 def _import_paths_of_direct_sources(proto_info):
     """Extracts the path used to import srcs of ProtoInfo.
