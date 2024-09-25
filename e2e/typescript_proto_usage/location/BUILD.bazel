@@ -1,5 +1,11 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@com_github_gonzojive_rules_ts_proto//ts_proto:defs.bzl", "ts_proto_library")
+load("@rules_ts_proto//ts_proto:defs.bzl", "ts_proto_library")
+
+IMPLICIT_DEPS = {
+    "grpc-web": ["//:node_modules/grpc-web"],
+    "google-protobuf": ["//:node_modules/google-protobuf"],
+    "@types/google-protobuf": ["//:node_modules/@types/google-protobuf"],
+}
 
 proto_library(
     name = "location_proto",
@@ -10,6 +16,7 @@ proto_library(
 
 ts_proto_library(
     name = "location_ts_proto",
+    implicit_deps = IMPLICIT_DEPS,
     proto = ":location_proto",
     visibility = ["//visibility:public"],
 )

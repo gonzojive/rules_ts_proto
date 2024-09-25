@@ -1,10 +1,13 @@
 # This load statement must be in the docs/ package rather than anything users depend on
 # so that the dependency on stardoc doesn't leak to them.
-load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
+#load("@aspect_bazel_lib//lib:docs.bzl", "stardoc_with_diff_test", "update_docs")
 
-stardoc_with_diff_test(
-    name = "rules",
-    bzl_library_target = "//ts_proto:defs",
-)
+#stardoc_with_diff_test(
+#    name = "rules",
+#    bzl_library_target = "//ts_proto:defs",
+#)
 
-update_docs(name = "update")
+#update_docs(name = "update")
+
+# Documentation generation is currently broken with error:
+# File /home/red/.cache/bazel/_bazel_red/e291f014af85f3f5e7dea382668d473f/sandbox/linux-sandbox/522/execroot/_main/bazel-out/k8-opt-exec-ST-d57f47055a04/bin/docs/rules_stardoc.runfiles/local_config_platform/constraints.bzl imported '@platforms//host:constraints.bzl', yet /home/red/.cache/bazel/_bazel_red/e291f014af85f3f5e7dea382668d473f/sandbox/linux-sandbox/522/execroot/_main/bazel-out/k8-opt-exec-ST-d57f47055a04/bin/docs/rules_stardoc.runfiles/platforms/host/constraints.bzl was not found.

@@ -30,6 +30,8 @@ def _filtered_files_impl(ctx):
         if filter(f)
     ]
 
+    #print("_filtered_files_impl passed {} of {}".format(passed_files, all_files))
+
     return [
         DefaultInfo(
             files = depset(direct = passed_files),

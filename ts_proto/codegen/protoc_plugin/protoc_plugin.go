@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"os/exec"
 	"regexp"
@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	tsDefsRunfilesPath  = "com_github_gonzojive_rules_ts_proto/ts_proto/codegen/protoc-gen-ts.sh"
+	tsDefsRunfilesPath  = "rules_ts_proto/ts_proto/codegen/protoc-gen-ts.sh"
 	genJSRunfilesPath   = "com_google_protobuf_javascript/generator/protoc-gen-js"
 	grpcWebRunfilesPath = "com_github_grpc_grpc_web/javascript/net/grpc/web/generator/protoc-gen-grpc-web"
 
@@ -43,7 +43,7 @@ func run(ctx context.Context) error {
 	}
 	// Read CodeGeneratorRequest from stdin per
 	// https://developers.google.com/protocol-buffers/docs/reference/other.
-	reqBytes, err := ioutil.ReadAll(os.Stdin)
+	reqBytes, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return fmt.Errorf("error reading from stdin: %w", err)
 	}

@@ -1,0 +1,93 @@
+"End-to-end test of rules_ts_proto"
+
+module(
+    name = "typescript_proto_usage",
+    version = "0.0.1",
+    compatibility_level = 0,
+)
+
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "rules_proto", version = "6.0.2")
+bazel_dep(name = "protobuf", version = "26.0.bcr.2", repo_name = "com_google_protobuf")
+bazel_dep(name = "gazelle", version = "0.38.0", repo_name = "bazel_gazelle")
+bazel_dep(name = "aspect_rules_esbuild", version = "0.21.0-rc1")
+bazel_dep(name = "aspect_rules_js", version = "2.0.0")
+
+####### Node.js version #########
+# By default you get the node version from DEFAULT_NODE_VERSION in @rules_nodejs//nodejs:repositories.bzl
+# Optionally you can pin a different node version:
+bazel_dep(name = "rules_nodejs", version = "6.2.0")
+
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_dependency = True)
+node.toolchain(node_version = "18.12.1")
+#################################
+
+#bazel_dep(name = "googleapis", version = "0.0.0-20240819-fe8ba054a", repo_name = "com_google_api")
+bazel_dep(name = "googleapis", version = "0.0.0-20240326-1c8d509c5", repo_name = "com_google_api")
+
+bazel_dep(name = "aspect_rules_jasmine", version = "2.0.0", dev_dependency = True)
+
+bazel_dep(name = "aspect_bazel_lib", version = "2.9.0")
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
+npm.npm_translate_lock(
+    name = "example_npm",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "example_npm")
+
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+
+# Allows developers to use the matching pnpm version, for example:
+# bazel run -- @pnpm --dir /home/runner/work/rules_js/rules_js install
+use_repo(pnpm, "pnpm")
+
+bazel_dep(name = "aspect_rules_ts", version = "3.1.0")
+
+rules_ts_ext = use_extension("@aspect_rules_ts//ts:extensions.bzl", "ext", dev_dependency = True)
+rules_ts_ext.deps(
+    ts_version_from = "//:package.json",
+)
+use_repo(rules_ts_ext, "npm_typescript")
+
+bazel_dep(name = "rules_ts_proto", version = "0.0.0")
+#ts_proto_config = use_extension("@rules_ts_proto//ts_proto:extensions.bzl", "ts_proto_config")
+
+#ts_proto_config.implicit_dep(
+#    js_import = "grpc-web",
+#    ts_project_dep = "//:node_modules/grpc-web",
+#)
+#ts_proto_config.implicit_dep(
+#    js_import = "google-protobuf",
+#    ts_project_dep = "//:node_modules/google-protobuf",
+#)
+#ts_proto_config.implicit_dep(
+#    js_import = "@types/google-protobuf",
+#    ts_project_dep = "//:node_modules/@types/google-protobuf",
+#)
+
+############################
+
+local_path_override(
+    module_name = "rules_ts_proto",
+    path = "../..",
+)
+
+local_path_override(
+    module_name = "aspect_rules_ts",
+    path = "../../../rules_ts",
+)
+
+local_path_override(
+    module_name = "protobuf_javascript_gonzojive",
+    path = "../../../protobuf-javascript-bzlmod",
+)
+
+# Needed to resolve https://github.com/bazelbuild/bazel-central-registry/issues/2538.
+# Note this only has an effect when single_version_override is in the root module,
+# ruls_ts_proto. You'll need to copy paste it into.
+single_version_override(
+    module_name = "grpc-java",
+    version = "1.64.0",
+)

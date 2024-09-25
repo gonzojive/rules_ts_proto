@@ -10,4 +10,5 @@ jasmine_test(
         "//:greeting_ts_proto",
         "//location:location_ts_proto",
     ],
+    node_modules = "//:node_modules",
 )

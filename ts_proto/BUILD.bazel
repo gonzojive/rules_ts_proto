@@ -3,34 +3,9 @@ load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 # For stardoc to reference the files
 exports_files(["defs.bzl"])
 
-# This is the target rule authors should put in their "toolchains"
-# attribute in order to get a runtime for the correct platform.
-# See https://docs.bazel.build/versions/main/toolchains.html#writing-rules-that-use-toolchains
-toolchain_type(
-    name = "toolchain_type",
-    visibility = ["//visibility:public"],
-)
-
-bzl_library(
-    name = "repositories",
-    srcs = ["repositories.bzl"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "@bazel_tools//tools/build_defs/repo:http.bzl",
-        "@bazel_tools//tools/build_defs/repo:utils.bzl",
-    ],
-)
-
 bzl_library(
     name = "defs",
     srcs = ["defs.bzl"],
     visibility = ["//visibility:public"],
     deps = ["//ts_proto/private:ts_proto_library"],
-)
-
-bzl_library(
-    name = "workspace_deps",
-    srcs = ["workspace_deps.bzl"],
-    visibility = ["//visibility:public"],
-    deps = ["@aspect_rules_js//npm:npm_import"],
 )

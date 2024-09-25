@@ -1,0 +1,15 @@
+bazel_dep(name = "rules_ts_proto", version = "0.0.0", dev_dependency = True)
+bazel_dep(name = "bazel_skylib", version = "1.7.1", dev_dependency = True)
+
+local_path_override(
+    module_name = "rules_ts_proto",
+    path = "../..",
+)
+
+# Needed to resolve https://github.com/bazelbuild/bazel-central-registry/issues/2538.
+# Note this only has an effect when single_version_override is in the root module,
+# ruls_ts_proto. You'll need to copy paste it into.
+single_version_override(
+    module_name = "grpc-java",
+    version = "1.64.0",
+)
